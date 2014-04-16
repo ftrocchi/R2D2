@@ -26,7 +26,6 @@ void OnPressFoot(Button& b)
 {
     Serial.println("ONPRESSFOOT");
     FlipOverrideState(FOOT_STATE);
-    SetLEDs();
     ParkFoot(bitRead(overrideState, FOOT_STATE));
 }
 
@@ -34,7 +33,6 @@ void OnPressDome(Button& b)
 {
     Serial.println("ONPRESSDOME");
     FlipOverrideState(DOME_STATE);
-    SetLEDs();    
     ParkDome(bitRead(overrideState, DOME_STATE));
 }
 
@@ -42,7 +40,6 @@ void OnPressMute(Button& b)
 {
     Serial.println("ONPRESSMUTE");
     FlipOverrideState(MUTE_STATE);
-    SetLEDs();
     MuteAudio(bitRead(overrideState, MUTE_STATE));
 }
 
@@ -57,6 +54,11 @@ void FlipOverrideState(int state)
     bitWrite(overrideState, state, !bitRead(overrideState, state));
 }
 
+void SetOverrideState(int state, bool isOverride)
+{
+    bitWrite(overrideState, state, isOverride);
+}
+
 void SetLEDs()
 {
     digitalWrite(footLEDPin, bitRead(overrideState, FOOT_STATE) == 1 ? HIGH : LOW);
@@ -68,18 +70,30 @@ void SetLEDs()
 void ParkFoot(bool shouldPark)
 {
     // issue command to sabertooth 2x25
+    Serial.print("PARKFOOT: ");
+    Serial.println(shouldPark);
+    
+    SetLEDs();
 }
 
 // DOME
 void ParkDome(bool shouldPark)
 {
-    // issue command to syren 10  
+    // issue command to syren 10 
+    Serial.print("PARKDOME: ");
+    Serial.println(shouldPark);
+   
+   SetLEDs();
 }
 
 // MUTE
 void MuteAudio(bool shouldMute)
 {
     // issue command via I2C to mute audio
+    Serial.print("MUTEAUDIO: " );
+    Serial.println(shouldMute);
+    
+    SetLEDs();
 }
 
 void setup()
@@ -102,8 +116,10 @@ void setup()
     // setup override state
     overrideState = 7;  // all on
     
-    // set the LEDs
-    SetLEDs();
+    // set initial 
+    ParkFoot(true);
+    ParkDome(true);
+    MuteAudio(true);
 }
 
 void loop()
