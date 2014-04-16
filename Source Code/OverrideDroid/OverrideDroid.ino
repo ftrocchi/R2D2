@@ -7,12 +7,17 @@
 
 int footButtonPin = 4;
 int footLEDPin = 5;
-int domeButtonPin = 6;
-int domeLEDPin = 7;
-int muteButtonPin = 8;
-int muteLEDPin = 9;
-int battButtonPin = 10;
-int battLEDPin = 11;
+int footMotorPin = 6;
+
+int domeButtonPin = 7;
+int domeLEDPin = 8;
+int domeMotorPin = 9;
+
+int muteButtonPin = 10;
+int muteLEDPin = 11;
+
+int battButtonPin = 12;
+int battLEDPin = 13;
 
 Button footButton = Button(footButtonPin);
 Button domeButton = Button(domeButtonPin);
@@ -73,6 +78,8 @@ void ParkFoot(bool shouldPark)
     Serial.print("PARKFOOT: ");
     Serial.println(shouldPark);
     
+    digitalWrite(footMotorPin, shouldPark ? LOW : HIGH);
+    
     SetLEDs();
 }
 
@@ -82,6 +89,8 @@ void ParkDome(bool shouldPark)
     // issue command to syren 10 
     Serial.print("PARKDOME: ");
     Serial.println(shouldPark);
+    
+    digitalWrite(domeMotorPin, shouldPark ? LOW : HIGH);
    
    SetLEDs();
 }
