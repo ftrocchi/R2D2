@@ -2,6 +2,7 @@
 #include <SoftwareSerial.h>
 #include <XBee.h>
 #include "Button.h"
+#include "SingleLED.h"
 
 #define FOOT_STATE 0
 #define DOME_STATE 1
@@ -22,9 +23,13 @@ int battButtonPin = 12;
 int battLEDPin = 13;
 
 Button footButton = Button(footButtonPin);
+SingleLED footLED = SingleLED(footLEDPin, SINGLE_LED_ON);
 Button domeButton = Button(domeButtonPin);
+SingleLED domeLED = SingleLED(domeLEDPin, SINGLE_LED_ON);
 Button muteButton = Button(muteButtonPin);
+SingleLED muteLED = SingleLED(muteLEDPin, SINGLE_LED_ON);
 Button battButton = Button(battButtonPin);
+SingleLED battLED = SingleLED(battLEDPin, SINGLE_LED_ON);
 uint8_t overrideState;
 
 // xbee
@@ -74,9 +79,9 @@ void SetOverrideState(int state, bool isOverride)
 
 void SetLEDs()
 {
-    digitalWrite(footLEDPin, bitRead(overrideState, FOOT_STATE) == 1 ? HIGH : LOW);
-    digitalWrite(domeLEDPin, bitRead(overrideState, DOME_STATE) == 1 ? HIGH : LOW);
-    digitalWrite(muteLEDPin, bitRead(overrideState, MUTE_STATE) == 1 ? HIGH : LOW);
+    footLED.SetNewMode(!bitRead(overrideState, FOOT_STATE));
+    domeLED.SetNewMode(!bitRead(overrideState, DOME_STATE));
+    muteLED.SetNewMode(!bitRead(overrideState, MUTE_STATE));
 }
 
 void Park(int state, bool shouldPark)
@@ -116,12 +121,6 @@ void MuteAudio(bool shouldMute)
 
 void setup()
 {
-    // setup pins
-    pinMode(footLEDPin, OUTPUT);
-    pinMode(domeLEDPin, OUTPUT);
-    pinMode(muteLEDPin, OUTPUT);
-    pinMode(battLEDPin, OUTPUT);
-    
     // setup handlers
     footButton.PressHandler(OnPressFoot);
     domeButton.PressHandler(OnPressDome);
@@ -148,6 +147,9 @@ void loop()
     domeButton.Process();
     muteButton.Process();
     battButton.Process();
+    
+    // update leds
+    footLED.Update();
     
     // xbee communications here
     xbee.readPacket();
