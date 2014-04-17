@@ -1,5 +1,4 @@
 #include <XBee.h>
-#include <SendOnlySoftwareSerial.h>
 #include <Keypad.h>
 #include "ButtonPad.h"
 
