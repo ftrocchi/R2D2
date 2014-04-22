@@ -27,6 +27,9 @@ void WAVTrigger::SetMasterVolume(int volume)
 {
     int mappedVolume = map(volume, 0, 255, -70, 10);  
     
+    if (mappedVolume > 200)
+        mappedVolume = 200;
+    
     wavSerial->write(0xf0);
     wavSerial->write(0xaa);
     wavSerial->write(0x07);

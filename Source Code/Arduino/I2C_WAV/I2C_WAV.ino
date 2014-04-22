@@ -14,28 +14,30 @@ long ledStartTime;
 int ledDelay = 500;
 bool ledIsOn = false;
 
-
 void setup()
 {
     // setup the wav board
     pinMode(LED_PIN, OUTPUT);
+    digitalWrite(LED_PIN, LOW);
+    
     wavSerial.begin(57600);
     delay(2000);
-    wavTrigger.SetMasterVolume(128);
+    wavTrigger.SetMasterVolume(200);
     
     // setup I2C
     Wire.begin(I2C_DeviceAddress::WAV);
     Wire.onReceive(ReceiveEvent);
-    
-    delay(3000);
 }
 
 void loop()
 {
-    if (ledIsOn && ledStartTime + ledDelay < millis())
+    if (ledIsOn)
     {
-        ledIsOn = false;
-        digitalWrite(LED_PIN, LOW);
+        if (ledStartTime + ledDelay < millis())
+        {
+            ledIsOn = false;
+            digitalWrite(LED_PIN, LOW);
+        }
     }
 }
 
