@@ -13,6 +13,7 @@ SendOnlySoftwareSerial domeSerial(DOME_MOTOR_PIN);
 SendOnlySoftwareSerial footSerial(FOOT_MOTOR_PIN);
 Sabertooth domeMotor(128, domeSerial);
 Sabertooth footMotor(128, footSerial);
+bool isDomeMoving = false;
 
 //-------------------------------------------------------------------------------------------
 // PS2 CONTROLLER DECLARATIONS
@@ -31,7 +32,7 @@ void setup()
     delay(5000);
     
     // play the startup sound so we know we're ready to go
-    PlayTrackSolo(255);
+    PlayTrackSolo(52);
 }
 
 void loop()
@@ -81,6 +82,22 @@ void MotorSetup()
 void ProcessDomeMotor()
 {
     int value = map(gamePadState[PS2Control::LX], 0, 255, -127, 127);
+    
+    if (isDomeMoving && value == 0)
+    {
+        // stop sound
+        StopAllTracks();
+        
+        isDomeMoving = false;
+    }
+    else if (!isDomeMoving && value !=0)
+    {
+        // start sound
+        PlayTrackPoly(102);
+        
+        isDomeMoving = true;
+    }
+    
     domeMotor.motor(value);
 }
 
@@ -103,4 +120,21 @@ void PlayTrackSolo(int trackNumber)
     Wire.write(trackNumber);
     Wire.endTransmission();
 }
+
+void PlayTrackPoly(int trackNumber)
+{
+    Wire.beginTransmission(I2C_DeviceAddress::WAV);
+    Wire.write((byte)I2C_WAV_Command::PlayPoly);
+    Wire.write(trackNumber);
+    Wire.endTransmission();
+}
+
+void StopAllTracks()
+{
+    Wire.beginTransmission(I2C_DeviceAddress::WAV);
+    Wire.write((byte)I2C_WAV_Command::StopAll);
+    Wire.write(0);
+    Wire.endTransmission();
+}
+
 
