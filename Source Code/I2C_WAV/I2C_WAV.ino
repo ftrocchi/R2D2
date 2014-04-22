@@ -28,21 +28,14 @@ void setup()
     Wire.onReceive(ReceiveEvent);
     
     delay(3000);
-    
-    // play sound here
-    StartLED();
-    wavTrigger.TrackPlaySolo(53);
 }
 
 void loop()
 {
-    if (ledIsOn)
+    if (ledIsOn && ledStartTime + ledDelay < millis())
     {
-        if (ledStartTime + ledDelay < millis())
-        {
-            ledIsOn = false;
-            digitalWrite(LED_PIN, LOW);
-        }
+        ledIsOn = false;
+        digitalWrite(LED_PIN, LOW);
     }
 }
 
