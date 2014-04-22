@@ -21,7 +21,7 @@ void setup()
     pinMode(LED_PIN, OUTPUT);
     wavSerial.begin(57600);
     delay(2000);
-    wavTrigger.SetMasterVolume(-20);
+    wavTrigger.SetMasterVolume(128);
     
     // setup I2C
     Wire.begin(I2C_DeviceAddress::WAV);

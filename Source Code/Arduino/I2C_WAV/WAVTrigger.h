@@ -13,16 +13,16 @@
 
 class WAVTrigger
 {
-private:
-  void TrackControl(int track, int code);
-  SendOnlySoftwareSerial *wavSerial;
+    private:
+        void TrackControl(int track, int code);
+        SendOnlySoftwareSerial *wavSerial;
   
-public:
-  WAVTrigger(SendOnlySoftwareSerial *wavSendOnlySoftwareSerial);
-  void TrackPlaySolo(int track);
-  void TrackPlayPoly(int track);
-  void StopAllTracks();
-  void SetMasterVolume(int volume);
+    public:
+        WAVTrigger(SendOnlySoftwareSerial *wavSendOnlySoftwareSerial);
+        void TrackPlaySolo(int track);
+        void TrackPlayPoly(int track);
+        void StopAllTracks();
+        void SetMasterVolume(int volume);
 };
 
 #endif
