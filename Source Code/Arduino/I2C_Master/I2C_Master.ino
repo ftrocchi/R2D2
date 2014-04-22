@@ -20,6 +20,8 @@ Sabertooth footMotor(128, footSerial);
 #define MAX_ARRAY_LENGTH 20
 byte gamePadState[MAX_ARRAY_LENGTH];
 
+
+
 //-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
 //-------------------------------------------------------------------------------------------
@@ -27,6 +29,9 @@ void setup()
 {
     MotorSetup();
     I2CSetup();
+    
+    // play the startup sound so we know we're ready to go
+    PlayTrackSolo(255);
 }
 
 void loop()
@@ -88,4 +93,14 @@ void ProcessFootMotor()
     footMotor.turn(turnValue);
 }
 
+//-------------------------------------------------------------------------------------------
+// WAV FUNCTIONS
+//-------------------------------------------------------------------------------------------
+void PlayTrackSolo(int trackNumber)
+{
+    Wire.beginTransmission(I2C_DeviceAddress::WAV);
+    Wire.write(I2C_I2C_WAV_Command::PlaySolo);
+    Wire.write(trackNumber);
+    Wire.endTransmission();
+}
 
