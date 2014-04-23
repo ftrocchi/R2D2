@@ -14,6 +14,31 @@ void WAVTrigger::TrackPlayPoly(int track)
     TrackControl(track, TRACK_PLAY_POLY);
 }
 
+void WAVTrigger::TrackPause(int track)
+{
+    TrackControl(track, TRACK_PAUSE);
+}
+
+void WAVTrigger::TrackResume(int track)
+{
+    TrackControl(track, TRACK_RESUME);
+}
+
+void WAVTrigger::TrackStop(int track)
+{
+    TrackControl(track, TRACK_STOP);
+}
+
+void WAVTrigger::TrackLoopOn(int track)
+{
+    TrackControl(track, TRACK_LOOP_ON);
+}
+
+void WAVTrigger::TrackLoopOff(int track)
+{
+    TrackControl(track, TRACK_LOOP_OFF);
+}
+
 void WAVTrigger::StopAllTracks() 
 {
     wavSerial->write(0xf0);

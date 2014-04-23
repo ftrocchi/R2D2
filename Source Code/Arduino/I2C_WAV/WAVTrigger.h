@@ -8,8 +8,13 @@
 #define CMD_STOP_ALL           4
 #define CMD_VOLUME             5
 
-#define TRACK_PLAY_SOLO        0
-#define TRACK_PLAY_POLY        1
+#define TRACK_PLAY_SOLO 0
+#define TRACK_PLAY_POLY 1
+#define TRACK_PAUSE 2
+#define TRACK_RESUME 3
+#define TRACK_STOP 4
+#define TRACK_LOOP_ON 5
+#define TRACK_LOOP_OFF 6
 
 class WAVTrigger
 {
@@ -19,10 +24,26 @@ class WAVTrigger
   
     public:
         WAVTrigger(SendOnlySoftwareSerial *wavSendOnlySoftwareSerial);
-        void TrackPlaySolo(int track);
-        void TrackPlayPoly(int track);
-        void StopAllTracks();
-        void SetMasterVolume(int volume);
+        
+        void GetVersion(); // 0x01
+        void GetSysInfo(); // 0x02
+        
+        // CONTROL_TRACK 0x03
+        void TrackPlaySolo(int track); // 0x00
+        void TrackPlayPoly(int track); // 0x01
+        void TrackPause(int track); // 0x02
+        void TrackResume(int track); // 0x03
+        void TrackStop(int track); // 0x04
+        void TrackLoopOn(int track); // 0x05
+        void TrackLoopOff(int track); // 0x06
+        
+        void StopAllTracks(); // 0x04
+        void SetMasterVolume(int volume); // 0x05
+        
+        void GetStatus(); // 0x07
+        void TrackVolume(); // 0x08
+        void AmpPower(); // 0x09
+        
 };
 
 #endif
