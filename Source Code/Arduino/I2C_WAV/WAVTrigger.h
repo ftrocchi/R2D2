@@ -7,6 +7,8 @@
 #define CMD_TRACK_CONTROL      3
 #define CMD_STOP_ALL           4
 #define CMD_VOLUME             5
+#define CMD_TRACK_VOLUME 8
+#define CMD_AMP_POWER 9
 
 #define TRACK_PLAY_SOLO 0
 #define TRACK_PLAY_POLY 1
@@ -41,8 +43,8 @@ class WAVTrigger
         void SetMasterVolume(int volume); // 0x05
         
         void GetStatus(); // 0x07
-        void TrackVolume(); // 0x08
-        void AmpPower(); // 0x09
+        void TrackVolume(int track, int volume); // 0x08
+        void AmpPower(byte isOn); // 0x09
         
 };
 
