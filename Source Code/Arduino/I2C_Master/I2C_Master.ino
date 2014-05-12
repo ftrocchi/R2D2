@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <Sabertooth.h>
 #include <SendOnlySoftwareSerial.h>
+#include <SoftwareSerial.h>
 #include "I2C_Common.h"
 #include "PS2Control.h"
 
