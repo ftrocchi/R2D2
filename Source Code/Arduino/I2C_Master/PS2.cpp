@@ -52,3 +52,41 @@ byte PS2::GetValue(byte key)
     Uart_Send(key);
     return Uart_Recv();
 }
+
+bool PS2::GetAllValues()
+{
+    byte nbyte;
+    long waitCount = 0;
+    
+    Uart_Send(PS2_GET_ALL);
+    
+    while (ps2Serial->available() < 6)
+    {
+        waitCount++;
+        if (waitCount > 50000)
+            return false;
+    }
+    
+    for (int i=0; i<6; i++)
+        currentState[i] = ps2Serial->read();
+    
+    
+    return true;
+}
+
+void PS2::Vibrate(byte motor, byte value)
+{
+    if (motor != PS2_LARGE_MOTOR && motor != PS2_SMALL_MOTOR)
+        return;
+        
+    Uart_Send(motor);
+    Uart_Send(value);
+}
+
+void PS2::Reset(byte reset)
+{
+    if (reset == 1)
+        digitalWrite(A1, LOW);
+    else
+        digitalWrite(A1, HIGH);
+}
