@@ -5,52 +5,58 @@
 #include <SoftwareSerial.h>
 
 // defines here
-#define PS2_SELECT 0
-#define PS2_L3 1
-#define PS2_R3 2
-#define PS2_START 3
-#define PS2_PAD_UP 4
-#define PS2_PAD_RIGHT 5
-#define PS2_PAD_DOWN 6
-#define PS2_PAD_LEFT 7
-#define PS2_L2 8
-#define PS2_R2 9
-#define PS2_L1 10
-#define PS2_R1 11
-#define PS2_TRIANGLE 12
-#define PS2_CIRCLE 13
-#define PS2_CROSS 14
-#define PS2_SQUARE 15
-#define PS2_LX 16
-#define PS2_LY 17
-#define PS2_RX 18
-#define PS2_RY 19
-#define PS2_L_UP 20
-#define PS2_L_DOWN 21
-#define PS2_L_LEFT 22
-#define PS2_L_RIGHT 23
-#define PS2_R_UP 24
-#define PS2_R_DOWN 25
-#define PS2_R_LEFT 26
-#define PS2_R_RIGHT 27
 #define PS2_CONNECTION_STATUS 28
 #define PS2_SMALL_MOTOR 29
 #define PS2_LARGE_MOTOR 30
 #define PS2_GET_ALL 31
 
+// stick states
+#define PS2_STATE_RX 2
+#define PS2_STATE_RY 3
+#define PS2_STATE_LX 4
+#define PS2_STATE_LY 5
+
+// buttonstates
+#define PS2_STATE_SELECT 0
+#define PS2_STATE_L3 1
+#define PS2_STATE_R3 2
+#define PS2_STATE_START 3
+#define PS2_STATE_PAD_UP 4
+#define PS2_STATE_PAD_RIGHT 5
+#define PS2_STATE_PAD_DOWN 6
+#define PS2_STATE_PAD_LEFT 7
+
+#define PS2_STATE_L2 8
+#define PS2_STATE_R2 9
+#define PS2_STATE_L1 10
+#define PS2_STATE_R1 11
+#define PS2_STATE_TRIANGLE 12
+#define PS2_STATE_CIRCLE 13
+#define PS2_STATE_CROSS 14
+#define PS2_STATE_SQUARE 15
+
 class PS2
 {
     private:
         char currentState[6];
+        char previousState[6];
+        
+        bool GetButtonBit(char* state, byte button);
+        bool GetAllValues();
     
     public:
         PS2();
         
         void Init(long baudrate, byte receivePin, byte transmitPin);
-        byte GetValue(byte key);
-        bool GetAllValues();
         void Vibrate(byte motor, byte value);
-        void Reset(byte reset);
+        
+        // my functions
+        void Update();
+        byte GetStickValue(byte stick);
+        bool IsButtonPressed(byte button);
+        bool IsButtonReleased(byte button);
+        bool IsButtonJustPressed(byte button);
+        bool IsButtonJustReleased(byte button);
 
     protected:
         SoftwareSerial* ps2Serial;

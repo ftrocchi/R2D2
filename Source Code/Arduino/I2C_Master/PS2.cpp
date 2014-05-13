@@ -38,12 +38,6 @@ byte PS2::Uart_Recv()
     }
 }
 
-byte PS2::GetValue(byte key)
-{
-    Uart_Send(key);
-    return Uart_Recv();
-}
-
 bool PS2::GetAllValues()
 {
     long waitCount = 0;
@@ -72,7 +66,61 @@ void PS2::Vibrate(byte motor, byte value)
     Uart_Send(value);
 }
 
-void PS2::Reset(byte reset)
+// my functions here
+void PS2::Update()
 {
-    digitalWrite(A1, reset == 1 ? LOW : HIGH);
+    strncpy(previousState, currentState, 6);
+    GetAllValues();
 }
+
+byte PS2::GetStickValue(byte stick)
+{
+    if (stick != PS2_STATE_RX && stick != PS2_STATE_RY && stick != PS2_STATE_LX && stick != PS2_STATE_LY)
+        return 0;
+        
+    return currentState[stick];
+}
+
+bool PS2::GetButtonBit(char* state, byte button)
+{
+    if (button > PS2_STATE_SQUARE) 
+        return false;
+        
+    byte bitPosition = button;
+        
+    int byteToScan = 0;
+    if (bitPosition > PS2_STATE_PAD_LEFT)
+    {
+        byteToScan = 1;
+        bitPosition -= 8;
+    }
+    
+    return state[byteToScan] & (1 << bitPosition);
+}
+
+bool PS2::IsButtonPressed(byte button)
+{
+    return GetButtonBit(currentState, button);
+}
+
+bool PS2::IsButtonReleased(byte button)
+{
+    return !IsButtonPressed(button);
+}
+
+bool PS2::IsButtonJustPressed(byte button)
+{
+    bool current = GetButtonBit(currentState, button);
+    bool previous = GetButtonBit(previousState, button);
+    
+    return (current && !previous);
+}
+
+bool PS2::IsButtonJustReleased(byte button)
+{
+    bool current = GetButtonBit(currentState, button);
+    bool previous = GetButtonBit(previousState, button);
+
+    return (!current && previous);    
+}
+
