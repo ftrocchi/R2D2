@@ -5,8 +5,7 @@ struct I2C_DeviceAddress
 {
     enum Value
     {
-        PS2 = 110,
-        WAV = 111
+        WAV = 110
     };
 };
 
