@@ -86,16 +86,7 @@ bool PS2::GetButtonBit(char* state, byte button)
     if (button > PS2_STATE_SQUARE) 
         return false;
         
-    byte bitPosition = button;
-        
-    int byteToScan = 0;
-    if (bitPosition > PS2_STATE_PAD_LEFT)
-    {
-        byteToScan = 1;
-        bitPosition -= 8;
-    }
-    
-    return state[byteToScan] & (1 << bitPosition);
+    return state[button / 8] & (1 << button % 8);
 }
 
 bool PS2::IsButtonPressed(byte button)
