@@ -41,7 +41,6 @@
 class PS2
 {
     private:
-        bool SERIAL_ERR;
         char currentState[6];
     
     public:

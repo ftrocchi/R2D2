@@ -17,12 +17,6 @@ Sabertooth footMotor(128, footSerial);
 bool isDomeMoving = false;
 
 //-------------------------------------------------------------------------------------------
-// PS2 CONTROLLER DECLARATIONS
-//-------------------------------------------------------------------------------------------
-#define MAX_ARRAY_LENGTH 20
-byte gamePadState[MAX_ARRAY_LENGTH];
-
-//-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
 //-------------------------------------------------------------------------------------------
 void setup()
@@ -59,14 +53,6 @@ void I2CSetup()
 //-------------------------------------------------------------------------------------------
 void ProcessPS2()
 {
-    Wire.requestFrom(I2C_DeviceAddress::PS2, 20);
-
-    int index=0;
-    while (Wire.available())
-    {
-        gamePadState[index] = Wire.read();
-        index++;
-    }
 }
 
 //-------------------------------------------------------------------------------------------
@@ -82,7 +68,8 @@ void MotorSetup()
 
 void ProcessDomeMotor()
 {
-    int value = map(gamePadState[PS2Control::LX], 0, 255, -127, 127);
+//    int value = map(gamePadState[PS2Control::LX], 0, 255, -127, 127);
+int value = 0;
     
     if (isDomeMoving && value == 0)
     {
@@ -104,8 +91,8 @@ void ProcessDomeMotor()
 
 void ProcessFootMotor()
 {
-    int driveValue = map(gamePadState[PS2Control::RY], 0, 255, -127, 127);
-    int turnValue = map(gamePadState[PS2Control::RX], 0, 255, -127, 127);
+    int driveValue = 0; //map(gamePadState[PS2Control::RY], 0, 255, -127, 127);
+    int turnValue = 0; //map(gamePadState[PS2Control::RX], 0, 255, -127, 127);
     
     footMotor.drive(driveValue);
     footMotor.turn(turnValue);

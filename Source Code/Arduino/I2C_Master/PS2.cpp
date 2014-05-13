@@ -17,33 +17,24 @@ void PS2::Init(long baudrate, byte receivePin, byte transmitPin)
 void PS2::Uart_Send(byte data)
 {
     while(ps2Serial->available() > 0)
-    {
         ps2Serial->read();
-    }
     
     ps2Serial->write(data);
 }
 
 byte PS2::Uart_Recv()
 {
-    byte receivedData;
     long waitCount = 0;
     
     while(true)
     {
         if (ps2Serial->available() > 0)
-        {
-            receivedData = ps2Serial->read();
-            SERIAL_ERR = false;
-            return receivedData;
-        }
+            return ps2Serial->read();
         
         waitCount++;
+        
         if (waitCount > 50000)
-        {
-            SERIAL_ERR = true;
             return 0xFF;
-        }
     }
 }
 
@@ -55,7 +46,6 @@ byte PS2::GetValue(byte key)
 
 bool PS2::GetAllValues()
 {
-    byte nbyte;
     long waitCount = 0;
     
     Uart_Send(PS2_GET_ALL);
@@ -69,7 +59,6 @@ bool PS2::GetAllValues()
     
     for (int i=0; i<6; i++)
         currentState[i] = ps2Serial->read();
-    
     
     return true;
 }
@@ -85,8 +74,5 @@ void PS2::Vibrate(byte motor, byte value)
 
 void PS2::Reset(byte reset)
 {
-    if (reset == 1)
-        digitalWrite(A1, LOW);
-    else
-        digitalWrite(A1, HIGH);
+    digitalWrite(A1, reset == 1 ? LOW : HIGH);
 }
