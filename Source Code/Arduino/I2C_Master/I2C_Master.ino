@@ -19,7 +19,6 @@ SendOnlySoftwareSerial domeSerial(DOME_MOTOR_PIN);
 SendOnlySoftwareSerial footSerial(FOOT_MOTOR_PIN);
 Sabertooth domeMotor(128, domeSerial);
 Sabertooth footMotor(128, footSerial);
-bool isDomeMoving = false;
 
 //-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
@@ -75,31 +74,15 @@ void MotorSetup()
 
 void ProcessDomeMotor()
 {
-//    int value = map(gamePadState[PS2Control::LX], 0, 255, -127, 127);
-int value = 0;
-    
-    if (isDomeMoving && value == 0)
-    {
-        // stop sound
-        StopAllTracks();
-        
-        isDomeMoving = false;
-    }
-    else if (!isDomeMoving && value !=0)
-    {
-        // start sound
-        PlayTrackPoly(102);
-        
-        isDomeMoving = true;
-    }
+    int value = map(ps2.GetStickValue(PS2_STATE_LX), 0, 255, -127, 127);
     
     domeMotor.motor(value);
 }
 
 void ProcessFootMotor()
 {
-    int driveValue = 0; //map(gamePadState[PS2Control::RY], 0, 255, -127, 127);
-    int turnValue = 0; //map(gamePadState[PS2Control::RX], 0, 255, -127, 127);
+    int driveValue = map(ps2.GetStickValue(PS2_STATE_RX), 0, 255, -127, 127);
+    int turnValue = map(ps2.GetStickValue(PS2_STATE_RY), 0, 255, -127, 127);
     
     footMotor.drive(driveValue);
     footMotor.turn(turnValue);

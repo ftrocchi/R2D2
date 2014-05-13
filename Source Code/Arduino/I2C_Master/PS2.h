@@ -25,7 +25,6 @@
 #define PS2_STATE_PAD_RIGHT 5
 #define PS2_STATE_PAD_DOWN 6
 #define PS2_STATE_PAD_LEFT 7
-
 #define PS2_STATE_L2 8
 #define PS2_STATE_R2 9
 #define PS2_STATE_L1 10
