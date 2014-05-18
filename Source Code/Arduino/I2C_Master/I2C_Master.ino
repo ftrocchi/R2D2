@@ -3,7 +3,7 @@
 #include <SendOnlySoftwareSerial.h>
 #include <SoftwareSerial.h>
 #include "PS2.h"
-#include "I2C_Common.h"
+#include "WavTrigger.h"
 
 //-------------------------------------------------------------------------------------------
 // PS2 DECLARATIONS
@@ -13,26 +13,29 @@ PS2 ps2 = PS2();
 //-------------------------------------------------------------------------------------------
 // MOTOR DECLARATIONS
 //-------------------------------------------------------------------------------------------
-#define DOME_MOTOR_PIN 11
-#define FOOT_MOTOR_PIN 12
-SendOnlySoftwareSerial domeSerial(DOME_MOTOR_PIN);
-SendOnlySoftwareSerial footSerial(FOOT_MOTOR_PIN);
-Sabertooth domeMotor(128, domeSerial);
-Sabertooth footMotor(128, footSerial);
+#define MOTOR_PIN 7
+SendOnlySoftwareSerial motorSerial(MOTOR_PIN);
+Sabertooth domeMotor(128, motorSerial);
+//Sabertooth footMotor(129, motorSerial);
+
+//-------------------------------------------------------------------------------------------
+// WAVTRIGGER DECLARATIONS
+//-------------------------------------------------------------------------------------------
+#define WAV_PIN 6
+SendOnlySoftwareSerial wavSerial(WAV_PIN);
+WAVTrigger wavTrigger(&wavSerial);
 
 //-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
 //-------------------------------------------------------------------------------------------
 void setup()
 {
-    ps2.Init(115200, 8, 9);
+    ps2.Init(9600, 8, 9);
     MotorSetup();
-    I2CSetup();
-    
-    delay(5000);
+    WavTriggerSetup();
     
     // play the startup sound so we know we're ready to go
-    PlayTrackSolo(52);
+    wavTrigger.TrackPlaySolo(52);
 }
 
 void loop()
@@ -40,7 +43,7 @@ void loop()
     ProcessPS2();
     
     ProcessDomeMotor();
-    ProcessFootMotor();
+//    ProcessFootMotor();
 
     delay(20);
 }
@@ -50,7 +53,7 @@ void loop()
 //-------------------------------------------------------------------------------------------
 void I2CSetup()
 {
-    Wire.begin();
+//    Wire.begin();
 }
 
 //-------------------------------------------------------------------------------------------
@@ -66,53 +69,39 @@ void ProcessPS2()
 //-------------------------------------------------------------------------------------------
 void MotorSetup()
 {
-    domeSerial.begin(9600);
-    footSerial.begin(9600);
+    motorSerial.begin(9600);
     domeMotor.autobaud();
-    footMotor.autobaud();
+//    footMotor.autobaud();
 }
 
 void ProcessDomeMotor()
 {
     int value = map(ps2.GetStickValue(PS2_STATE_LX), 0, 255, -127, 127);
     
+    // anything within 20 of 0 consider it to be zero
+    if (abs(value) <= 20)
+        value = 0;
+    
     domeMotor.motor(value);
 }
 
 void ProcessFootMotor()
 {
-    int driveValue = map(ps2.GetStickValue(PS2_STATE_RX), 0, 255, -127, 127);
-    int turnValue = map(ps2.GetStickValue(PS2_STATE_RY), 0, 255, -127, 127);
+//    int driveValue = map(ps2.GetStickValue(PS2_STATE_RX), 0, 255, -127, 127);
+//    int turnValue = map(ps2.GetStickValue(PS2_STATE_RY), 0, 255, -127, 127);
     
-    footMotor.drive(driveValue);
-    footMotor.turn(turnValue);
+//    footMotor.drive(driveValue);
+//    footMotor.turn(turnValue);
 }
 
 //-------------------------------------------------------------------------------------------
-// WAV FUNCTIONS
+// WAVTRIGGER FUNCTIONS
 //-------------------------------------------------------------------------------------------
-void PlayTrackSolo(int trackNumber)
+void WavTriggerSetup()
 {
-    Wire.beginTransmission(I2C_DeviceAddress::WAV);
-    Wire.write((byte)I2C_WAV_Command::PlaySolo);
-    Wire.write(trackNumber);
-    Wire.endTransmission();
-}
-
-void PlayTrackPoly(int trackNumber)
-{
-    Wire.beginTransmission(I2C_DeviceAddress::WAV);
-    Wire.write((byte)I2C_WAV_Command::PlayPoly);
-    Wire.write(trackNumber);
-    Wire.endTransmission();
-}
-
-void StopAllTracks()
-{
-    Wire.beginTransmission(I2C_DeviceAddress::WAV);
-    Wire.write((byte)I2C_WAV_Command::StopAll);
-    Wire.write(0);
-    Wire.endTransmission();
+    wavSerial.begin(57600);
+    delay(2000);
+    wavTrigger.SetMasterVolume(200);
 }
 
 

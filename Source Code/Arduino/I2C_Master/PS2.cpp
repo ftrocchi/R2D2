@@ -6,6 +6,9 @@ PS2::PS2()
 
 void PS2::Init(long baudrate, byte receivePin, byte transmitPin)
 {
+    Serial.begin(57600);
+    Serial.println("BEGIN");
+    
     pinMode(receivePin, INPUT);
     pinMode(transmitPin, OUTPUT);
     ps2Serial = new SoftwareSerial(receivePin, transmitPin);
@@ -52,7 +55,9 @@ bool PS2::GetAllValues()
     }
     
     for (int i=0; i<6; i++)
+    {
         currentState[i] = ps2Serial->read();
+    }
     
     return true;
 }
