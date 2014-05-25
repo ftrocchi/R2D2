@@ -2,8 +2,22 @@
 #include <Sabertooth.h>
 #include <SendOnlySoftwareSerial.h>
 #include <SoftwareSerial.h>
+#include <SPI.h>
+#include <Ethernet.h>
+#include <SD.h>
+
+#define MAX_FRAME_LENGTH 64
+
+#include <WebSocket.h>
 #include "PS2.h"
 #include "WavTrigger.h"
+
+//-------------------------------------------------------------------------------------------
+// WEBSOCKET DECLARATIONS
+//-------------------------------------------------------------------------------------------
+byte mac[6];
+byte ip[4];
+WebSocket webSocket;
 
 //-------------------------------------------------------------------------------------------
 // PS2 DECLARATIONS
@@ -49,6 +63,81 @@ void loop()
 }
 
 //-------------------------------------------------------------------------------------------
+// WEBSOCKET FUNCTIONS
+//-------------------------------------------------------------------------------------------
+void WebSocketSetup()
+{
+    byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x5F, 0xFB };
+    byte ip[] = { 192, 168, 1, 82 };
+    
+    Ethernet.begin(mac, ip);
+    
+    webSocket.registerConnectCallback(&OnConnect);
+    webSocket.registerDataCallback(&OnData);
+    webSocket.registerDisconnectCallback(&OnDisconnect);
+    
+    webSocket.begin();
+    
+    delay(100);    
+}
+
+void OnConnect(WebSocket &socket)
+{
+}
+
+void OnDisconnect(WebSocket &socket)
+{
+}
+
+void OnData(WebSocket &socket, char* dataString, byte frameLength)
+{
+    // split the data
+    byte command[12];
+    int index = 0;
+    char *savePointer;
+    char *token;
+    
+    for (token = strtok_r(dataString, "/", &savePointer); token; token = strtok_r(NULL, "/", &savePointer))
+    {
+        command[index] = atoi(token);
+        index++;
+    }
+    
+    // if it is less than 128 it is an i2c command so send it over i2c
+    if (command[0] < 128)
+    {
+        Wire.beginTransmission(command[0]);
+        for (int i=1; i < index; i++)
+            Wire.write(command[index]);
+        Wire.endTransmission();
+        return;
+    }
+    
+    // 128 is the dome motor
+    if (command[0] == 128)
+    {
+        MoveDome(command[1]);
+        return;
+    }
+    
+    // 129 is the foot motor, but we are going to ignore it
+    if (command[0] == 129)
+        return;
+        
+    // 130 is body sound
+    if (command[0] == 130)
+    {
+        return;
+    }
+    
+    // 131 is volume
+    if (command[0] == 131)
+    {
+        return;
+    }
+}
+
+//-------------------------------------------------------------------------------------------
 // I2C FUNCTIONS
 //-------------------------------------------------------------------------------------------
 void I2CSetup()
@@ -76,13 +165,18 @@ void MotorSetup()
 
 void ProcessDomeMotor()
 {
-    int value = map(ps2.GetStickValue(PS2_STATE_LX), 0, 255, -127, 127);
+    MoveDome(ps2.GetStickValue(PS2_STATE_LX));
+}
+
+void MoveDome(int value)
+{
+    int mappedValue = map(value, 0, 255, -127, 127);
     
     // anything within 20 of 0 consider it to be zero
-    if (abs(value) <= 20)
-        value = 0;
+    if (abs(mappedValue) <= 20)
+        mappedValue = 0;
     
-    domeMotor.motor(value);
+    domeMotor.motor(mappedValue);
 }
 
 void ProcessFootMotor()
