@@ -75,6 +75,7 @@ void PS2::Update()
 {
     strncpy(previousState, currentState, 6);
     GetAllValues();
+    DetermineActivity();
 }
 
 byte PS2::GetStickValue(byte stick)
@@ -90,7 +91,7 @@ bool PS2::GetButtonBit(char* state, byte button)
     if (button > PS2_STATE_SQUARE) 
         return false;
         
-    return (state[button / 8] & (1 << button % 8)) > 0;
+    return (state[button / 8] & (1 << button % 8)) == 0;
 }
 
 bool PS2::IsButtonPressed(byte button)
@@ -129,23 +130,24 @@ bool PS2::IsStickCentered(byte stick)
 
 bool PS2::IsControllerIdle()
 {
-    return lastTimeControllerActive - millis() > PS2_NOT_USED_INTERVAL;
+    return millis() - lastTimeControllerActive > PS2_NOT_USED_INTERVAL;
 }
 
 void PS2::DetermineActivity()
 {
     bool isActive = false;
+    
     // if any stick is not centered then the controller is active
     if (!IsStickCentered(PS2_STATE_RX) ||
         !IsStickCentered(PS2_STATE_RY) ||
         !IsStickCentered(PS2_STATE_LX) ||
         !IsStickCentered(PS2_STATE_LY))
         isActive = true;
-        
+
     // now check the buttons
-    if (currentState[0] > 0 || currentState[1] > 0)
-        isActive = true;
-    
+    for (int i=0; i < 16; i++)
+        isActive += IsButtonPressed(i);
+        
     // if active is true, reset the timer
     if (isActive)
         lastTimeControllerActive = millis();

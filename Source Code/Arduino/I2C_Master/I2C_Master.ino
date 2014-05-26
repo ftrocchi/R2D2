@@ -14,6 +14,8 @@
 //-------------------------------------------------------------------------------------------
 // WEBSOCKET DECLARATIONS
 //-------------------------------------------------------------------------------------------
+#define SOURCE_PS2 1
+#define SOURCE_TABLET 2
 byte mac[6];
 byte ip[4];
 WebSocket webSocket;
@@ -43,6 +45,8 @@ WAVTrigger wavTrigger(&wavSerial);
 //-------------------------------------------------------------------------------------------
 void setup()
 {
+    Serial.begin(9600);
+    Serial.println("BEGIN");
     WebSocketSetup();
     ps2.Init(9600, 8, 9);
     MotorSetup();
@@ -57,7 +61,7 @@ void loop()
     webSocket.listen();
     ProcessPS2();
     
-    ProcessDomeMotor();
+    ProcessDomeMotor(SOURCE_PS2);
 //    ProcessFootMotor();
 
     delay(20);
@@ -117,7 +121,7 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
     // 128 is the dome motor
     if (command[0] == 128)
     {
-        MoveDome(command[1]);
+        ProcessDomeMotor(SOURCE_TABLET, command[1]);
         return;
     }
     
@@ -164,9 +168,26 @@ void MotorSetup()
 //    footMotor.autobaud();
 }
 
-void ProcessDomeMotor()
+void ProcessDomeMotor(int source)
 {
-    MoveDome(ps2.GetStickValue(PS2_STATE_LX));
+    ProcessDomeMotor(source, 127);
+}
+
+void ProcessDomeMotor(int source, int value)
+{
+    // if the source is the PS2 controller, and it is moving, 
+    // then use it.
+    if (source == SOURCE_PS2)
+    {
+        if (!ps2.IsControllerIdle())
+        {
+            MoveDome(ps2.GetStickValue(PS2_STATE_LX));
+            return;
+        }
+    }
+    
+    if (source == SOURCE_TABLET && ps2.IsControllerIdle())
+        MoveDome(value);
 }
 
 void MoveDome(int value)
