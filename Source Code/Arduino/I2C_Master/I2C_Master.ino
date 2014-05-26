@@ -44,6 +44,8 @@ WAVTrigger wavTrigger(&wavSerial);
 //-------------------------------------------------------------------------------------------
 void setup()
 {
+    Serial.begin(9600);
+    Serial.println("BEGIN");
     ps2.Init(9600, 8, 9);
     MotorSetup();
     WavTriggerSetup();
@@ -67,6 +69,7 @@ void loop()
 //-------------------------------------------------------------------------------------------
 void WebSocketSetup()
 {
+    Serial.println("WebSocketSetup()");
     byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x5F, 0xFB };
     byte ip[] = { 192, 168, 1, 82 };
     
@@ -79,18 +82,22 @@ void WebSocketSetup()
     webSocket.begin();
     
     delay(100);    
+    Serial.println("WebSocketSetup done");
 }
 
 void OnConnect(WebSocket &socket)
 {
+    Serial.println("WebSocketConnect");
 }
 
 void OnDisconnect(WebSocket &socket)
 {
+    Serial.println("WebSocketDisconnect");
 }
 
 void OnData(WebSocket &socket, char* dataString, byte frameLength)
 {
+    Serial.println("WebSocketData");
     // split the data
     byte command[12];
     int index = 0;
@@ -102,6 +109,9 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
         command[index] = atoi(token);
         index++;
     }
+    
+    Serial.print("COMMAND:");
+    Serial.println(command[0]);
     
     // if it is less than 128 it is an i2c command so send it over i2c
     if (command[0] < 128)
