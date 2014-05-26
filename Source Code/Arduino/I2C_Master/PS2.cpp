@@ -6,15 +6,14 @@ PS2::PS2()
 
 void PS2::Init(long baudrate, byte receivePin, byte transmitPin)
 {
-    Serial.begin(57600);
-    Serial.println("BEGIN");
-    
     pinMode(receivePin, INPUT);
     pinMode(transmitPin, OUTPUT);
     ps2Serial = new SoftwareSerial(receivePin, transmitPin);
     ps2Serial->begin(baudrate);
     pinMode(A1, OUTPUT);
     digitalWrite(A1, HIGH);
+    
+    lastTimeControllerActive = millis();
 }
 
 void PS2::Uart_Send(byte data)
@@ -118,5 +117,37 @@ bool PS2::IsButtonJustReleased(byte button)
     bool previous = GetButtonBit(previousState, button);
 
     return (!current && previous);    
+}
+
+bool PS2::IsStickCentered(byte stick)
+{
+    if (stick != PS2_STATE_RX && stick != PS2_STATE_RY && stick != PS2_STATE_LX && stick != PS2_STATE_LY)
+        return false;
+     
+     return abs(GetStickValue(stick) - PS2_STICK_CENTERED_VALUE) <= PS2_STICK_CENTERED_TOLERANCE;
+}
+
+bool PS2::IsControllerIdle()
+{
+    return lastTimeControllerActive - millis() > PS2_NOT_USED_INTERVAL;
+}
+
+void PS2::DetermineActivity()
+{
+    bool isActive = false;
+    // if any stick is not centered then the controller is active
+    if (!IsStickCentered(PS2_STATE_RX) ||
+        !IsStickCentered(PS2_STATE_RY) ||
+        !IsStickCentered(PS2_STATE_LX) ||
+        !IsStickCentered(PS2_STATE_LY))
+        isActive = true;
+        
+    // now check the buttons
+    if (currentState[0] > 0 || currentState[1] > 0)
+        isActive = true;
+    
+    // if active is true, reset the timer
+    if (isActive)
+        lastTimeControllerActive = millis();
 }
 

@@ -34,14 +34,23 @@
 #define PS2_STATE_CROSS 14
 #define PS2_STATE_SQUARE 15
 
+// tolerances
+#define PS2_STICK_CENTERED_TOLERANCE 5
+#define PS2_STICK_CENTERED_VALUE 127
+
+// timings
+#define PS2_NOT_USED_INTERVAL 5000
+
 class PS2
 {
     private:
         char currentState[6];
         char previousState[6];
+        long lastTimeControllerActive;
         
         bool GetButtonBit(char* state, byte button);
         bool GetAllValues();
+        void DetermineActivity();
     
     public:
         PS2();
@@ -56,6 +65,8 @@ class PS2
         bool IsButtonReleased(byte button);
         bool IsButtonJustPressed(byte button);
         bool IsButtonJustReleased(byte button);
+        bool IsStickCentered(byte stick);
+        bool IsControllerIdle();
 
     protected:
         SoftwareSerial* ps2Serial;
