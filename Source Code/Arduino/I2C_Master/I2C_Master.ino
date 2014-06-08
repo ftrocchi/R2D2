@@ -39,6 +39,8 @@ Sabertooth domeMotor(128, motorSerial);
 #define WAV_PIN 6
 SendOnlySoftwareSerial wavSerial(WAV_PIN);
 WAVTrigger wavTrigger(&wavSerial);
+bool enteringWAVCode;
+byte wavCode;
 
 //-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
@@ -54,12 +56,15 @@ void setup()
     
     // play the startup sound so we know we're ready to go
     wavTrigger.TrackPlaySolo(52);
+    delay(2000);
 }
 
 void loop()
 {
     webSocket.listen();
     ProcessPS2();
+    
+    ProcessWavTrigger();
     
     ProcessDomeMotor(SOURCE_PS2);
 //    ProcessFootMotor();
@@ -217,7 +222,56 @@ void WavTriggerSetup()
 {
     wavSerial.begin(57600);
     delay(2000);
-    wavTrigger.SetMasterVolume(200);
+    wavTrigger.SetMasterVolume(128);
+    enteringWAVCode = false;
+}
+
+void ProcessWavTrigger()
+{
+    if (ps2.IsButtonJustPressed(PS2_STATE_R1))
+    {
+        Serial.println("LISTENING FOR CODE");
+        enteringWAVCode = true;
+        wavCode = 0;
+    }
+        
+    if (enteringWAVCode)
+    {
+        // use bit shifting to bring in the code
+        if (ps2.IsButtonJustPressed(PS2_STATE_CROSS)) 
+            wavCode = wavCode << 2;
+
+        if (ps2.IsButtonJustPressed(PS2_STATE_CIRCLE)) 
+        {
+            wavCode = wavCode << 2;
+            wavCode += 1;
+        }
+        
+        if (ps2.IsButtonJustPressed(PS2_STATE_TRIANGLE)) 
+        {
+            wavCode = wavCode << 2;
+            wavCode += 2;
+        }
+        
+        if (ps2.IsButtonJustPressed(PS2_STATE_SQUARE) )
+        {
+            wavCode = wavCode << 2;
+            wavCode += 3;
+        }
+    }
+    
+    if (ps2.IsButtonJustReleased(PS2_STATE_R1))
+    {
+        Serial.println("TIME TO PLAY SOUND");
+        enteringWAVCode = false;
+        Serial.println(wavCode);
+        
+        if (wavCode == 0)
+            wavTrigger.StopAllTracks();
+        
+        // play it here!
+        wavTrigger.TrackPlaySolo(wavCode);
+    }
 }
 
 
