@@ -41,6 +41,7 @@ SendOnlySoftwareSerial wavSerial(WAV_PIN);
 WAVTrigger wavTrigger(&wavSerial);
 bool enteringWAVCode;
 byte wavCode;
+byte masterVolume;
 
 //-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
@@ -137,12 +138,18 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
     // 130 is body sound
     if (command[0] == 130)
     {
+        if (command[1] == 0)
+            wavTrigger.StopAllTracks();
+        else
+            wavTrigger.TrackPlaySolo(command[1]);
         return;
     }
     
     // 131 is volume
     if (command[0] == 131)
     {
+        masterVolume = command[1];
+        wavTrigger.SetMasterVolume(masterVolume);    
         return;
     }
 }
@@ -222,7 +229,9 @@ void WavTriggerSetup()
 {
     wavSerial.begin(57600);
     delay(2000);
-    wavTrigger.SetMasterVolume(128);
+    wavTrigger.AmpPower(false);
+    masterVolume = 200;
+    wavTrigger.SetMasterVolume(masterVolume);
     enteringWAVCode = false;
 }
 
@@ -271,6 +280,18 @@ void ProcessWavTrigger()
         
         // play it here!
         wavTrigger.TrackPlaySolo(wavCode);
+    }
+    
+    // VOLUME
+    if (ps2.IsButtonPressed(PS2_STATE_PAD_UP) && masterVolume < 255)
+    {
+        masterVolume++;
+        wavTrigger.SetMasterVolume(masterVolume);
+    }
+    else  if (ps2.IsButtonPressed(PS2_STATE_PAD_DOWN) && masterVolume > 0)
+    {
+        masterVolume--;
+        wavTrigger.SetMasterVolume(masterVolume);
     }
 }
 
