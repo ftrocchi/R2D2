@@ -49,6 +49,17 @@
 				socket.onmessage = function(messageEvent) {
 					console.log("SOCKET MESSAGE");
 					console.log(messageEvent.data);
+					
+					// get the command and the value
+					var data = messageEvent.data.split('/');
+					console.log(data[0]);
+					console.log(data[1]);
+					
+					if (data[0] == "130") {
+						var newVolume = parseInt(data[1]);
+						SetBodyVolume(newVolume);
+					}
+						
 					SetConnectedIcon(0);
 				};
 				socket.onclose = function(closeEvent) {
@@ -110,6 +121,11 @@
 		
 		function BodyStopSound() {
 			SendCommand('130/0');
+		}
+		
+		function SetBodyVolume(newVolume) {
+			$("#bodyVolume").val(newVolume);
+			$("#bodyVolume").slider('refresh');
 		}
 		
 		//------------------------------------------------------------------------
@@ -476,7 +492,7 @@
 		<div data-role="content">
 			<div data-role="fieldcontain">
 				<label for="bodyVolume">Body Volume:</label>
-				<input data-theme="a" type="range" id="bodyVolume" value="0" min="0" max="255"  />
+				<input data-theme="a" type="range" id="bodyVolume" value="200" min="0" max="255"  />
 			</div>
 			<div data-role="fieldcontain">
 			    <label for="bodySoundSelection">Sound Selection:</label>

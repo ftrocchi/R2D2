@@ -286,11 +286,17 @@ void ProcessWavTrigger()
     if (ps2.IsButtonPressed(PS2_STATE_PAD_UP) && masterVolume < 255)
     {
         masterVolume++;
+        char buf[7];
+        sprintf(buf, "130/%03u", masterVolume);
+        webSocket.send(buf, 7);
         wavTrigger.SetMasterVolume(masterVolume);
     }
     else  if (ps2.IsButtonPressed(PS2_STATE_PAD_DOWN) && masterVolume > 0)
     {
         masterVolume--;
+        char buf[7];
+        sprintf(buf, "130/%03u", masterVolume);
+        webSocket.send(buf, 7);
         wavTrigger.SetMasterVolume(masterVolume);
     }
 }
