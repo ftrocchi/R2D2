@@ -54,6 +54,7 @@ void setup()
     ps2.Init(9600, 8, 9);
     MotorSetup();
     WavTriggerSetup();
+    I2CSetup();
     
     // play the startup sound so we know we're ready to go
     wavTrigger.TrackPlaySolo(52);
@@ -117,10 +118,18 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
     // if it is less than 128 it is an i2c command so send it over i2c
     if (command[0] < 128)
     {
+        Serial.print("COMMAND RECEIVED: ");
+        Serial.println(command[0]);
         Wire.beginTransmission(command[0]);
         for (int i=1; i < index; i++)
-            Wire.write(command[index]);
+        {
+            Serial.println(command[i]);
+            Wire.write(command[i]);
+        }
+            
+        Serial.println("ENDING");
         Wire.endTransmission();
+        Serial.println("ENDED");
         return;
     }
     
@@ -159,7 +168,7 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
 //-------------------------------------------------------------------------------------------
 void I2CSetup()
 {
-//    Wire.begin();
+    Wire.begin();
 }
 
 //-------------------------------------------------------------------------------------------
