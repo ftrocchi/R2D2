@@ -44,15 +44,24 @@ bool PS2::GetAllValues()
 {
     long waitCount = 0;
     
+    //Serial.println("---------------UART_SEND");
     Uart_Send(PS2_GET_ALL);
     
+    //Serial.println("---------------WHILE LOOP");
+    
+    int count = 0;
+    int temp = 0;
     while (ps2Serial->available() < 6)
     {
         waitCount++;
         if (waitCount > 50000)
+        {
+            //Serial.println("EXITEXITEXITEXITEXITEXITEXITEXITEXITEXIT");
             return false;
+        }
     }
     
+    //Serial.println("---------------READ");
     for (int i=0; i<6; i++)
     {
         currentState[i] = ps2Serial->read();
@@ -75,7 +84,7 @@ void PS2::Update()
 {
     strncpy(previousState, currentState, 6);
     GetAllValues();
-    DetermineActivity();
+        DetermineActivity();
 }
 
 byte PS2::GetStickValue(byte stick)

@@ -42,8 +42,7 @@
 					SetConnectedIcon(1);
 				};
 				socket.onerror = function(errorEvent) {
-					console.log("SOCKET ERROR");
-					console.log(errorEvent.data);
+					console.log("SOCKET ERROR - CODE: " + errorEvent.code + " - REASON: " + errorEvent.reason);
 					SetConnectedIcon(0);
 				};
 				socket.onmessage = function(messageEvent) {
@@ -99,9 +98,9 @@
 		//------------------------------------------------------------------------
 		// SOUND FUNCTIONS
 		//------------------------------------------------------------------------
-		var bodyVolume = 200;
+		var bodyVolume = 50;
 
-		$(document).on('change', '#bodyVolume', function(event, ui) {
+		$(document).on('slidestop', '#bodyVolume', function(event, ui) {
 		    var newVolume = $("#bodyVolume").val();
 			
 		    if (bodyVolume != newVolume) {
@@ -193,7 +192,7 @@
 	
 	<div data-role='page' id='StartPage'>
 		<div data-role='header'>
-			<h1>WinduI2CDeviceManager Dipak</h1>
+			<h1>WinduI2C</h1>
 			<a href="" class="connectButton ui-btn-right" data-icon="delete" data-theme="c" onClick="WebSocketConnect();">Disconnected</a>		
 		</div>
 		<div data-role='content'>
@@ -492,7 +491,7 @@
 		<div data-role="content">
 			<div data-role="fieldcontain">
 				<label for="bodyVolume">Body Volume:</label>
-				<input data-theme="a" type="range" id="bodyVolume" value="200" min="0" max="255"  />
+				<input data-theme="a" type="range" id="bodyVolume" value="50" min="0" max="255" step="5" />
 			</div>
 			<div data-role="fieldcontain">
 			    <label for="bodySoundSelection">Sound Selection:</label>

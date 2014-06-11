@@ -48,8 +48,8 @@ byte masterVolume;
 //-------------------------------------------------------------------------------------------
 void setup()
 {
-    Serial.begin(9600);
-    Serial.println("BEGIN");
+    //Serial.begin(9600);
+    //Serial.println("BEGIN");
     WebSocketSetup();
     ps2.Init(9600, 8, 9);
     MotorSetup();
@@ -63,11 +63,16 @@ void setup()
 
 void loop()
 {
+    //Serial.println("LOOP");
     webSocket.listen();
+    
+    //Serial.println("-----PS2");
     ProcessPS2();
     
+   // Serial.println("-----WAV");
     ProcessWavTrigger();
     
+    //Serial.println("-----DOME");
     ProcessDomeMotor(SOURCE_PS2);
 //    ProcessFootMotor();
 
@@ -115,21 +120,30 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
         index++;
     }
     
+    Serial.print("I2C MESSAGE:");
+    Serial.print(command[0]);
+    for (int i=1; i < index; i++)
+    {
+        Serial.print("-");
+        Serial.print(command[i]);
+    }
+    Serial.println("");
+    
     // if it is less than 128 it is an i2c command so send it over i2c
     if (command[0] < 128)
     {
-        Serial.print("COMMAND RECEIVED: ");
-        Serial.println(command[0]);
+        //Serial.print("COMMAND RECEIVED: ");
+        //Serial.println(command[0]);
         Wire.beginTransmission(command[0]);
         for (int i=1; i < index; i++)
         {
-            Serial.println(command[i]);
+            //Serial.println(command[i]);
             Wire.write(command[i]);
         }
             
-        Serial.println("ENDING");
+        //Serial.println("ENDING");
         Wire.endTransmission();
-        Serial.println("ENDED");
+        //Serial.println("ENDED");
         return;
     }
     
@@ -158,7 +172,7 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
     if (command[0] == 131)
     {
         masterVolume = command[1];
-        AdjustMasterVolume(masterVolume);
+        AdjustMasterVolume(masterVolume, false);
         return;
     }
 }
@@ -239,7 +253,7 @@ void WavTriggerSetup()
     wavSerial.begin(57600);
     delay(2000);
     wavTrigger.AmpPower(false);
-    masterVolume = 200;
+    masterVolume = 50;
     wavTrigger.SetMasterVolume(masterVolume);
     enteringWAVCode = false;
 }
@@ -248,7 +262,7 @@ void ProcessWavTrigger()
 {
     if (ps2.IsButtonJustPressed(PS2_STATE_R1))
     {
-        Serial.println("LISTENING FOR CODE");
+        //Serial.println("LISTENING FOR CODE");
         enteringWAVCode = true;
         wavCode = 0;
     }
@@ -280,9 +294,9 @@ void ProcessWavTrigger()
     
     if (ps2.IsButtonJustReleased(PS2_STATE_R1))
     {
-        Serial.println("TIME TO PLAY SOUND");
+        //Serial.println("TIME TO PLAY SOUND");
         enteringWAVCode = false;
-        Serial.println(wavCode);
+        //Serial.println(wavCode);
         
         if (wavCode == 0)
             wavTrigger.StopAllTracks();
@@ -292,24 +306,34 @@ void ProcessWavTrigger()
     }
     
     // VOLUME
-    if (ps2.IsButtonPressed(PS2_STATE_PAD_UP) && masterVolume < 255)
+    //Serial.print("SOUND BUTTONS: (");
+    //Serial.print(masterVolume);
+    //Serial.print(") - UP:");
+    //Serial.print(ps2.IsButtonPressed(PS2_STATE_PAD_UP));
+    //Serial.print(" - DOWN:");
+    //Serial.println(ps2.IsButtonPressed(PS2_STATE_PAD_DOWN));
+    
+    
+    
+    
+    if (ps2.IsButtonPressed(PS2_STATE_PAD_UP) && masterVolume < 250)
     {
-        masterVolume++;
-        AdjustMasterVolume(masterVolume);
+        masterVolume+=5;
+        AdjustMasterVolume(masterVolume, true);
     }
-    else  if (ps2.IsButtonPressed(PS2_STATE_PAD_DOWN) && masterVolume > 0)
+    else  if (ps2.IsButtonPressed(PS2_STATE_PAD_DOWN) && masterVolume > 5)
     {
-        masterVolume--;
-        AdjustMasterVolume(masterVolume);
+        masterVolume-=5;
+        AdjustMasterVolume(masterVolume, true);
     }
 }
 
-void AdjustMasterVolume(byte newVolume)
+void AdjustMasterVolume(byte newVolume, bool updateTablet)
 {
-    if (webSocket.isConnected())
+    if (updateTablet && webSocket.isConnected())
     {
         char buf[7];
-        sprintf(buf, "130/%03u", masterVolume);
+        sprintf(buf, "131/%03u", masterVolume);
         webSocket.send(buf, 7);
     }    
     
