@@ -253,7 +253,7 @@ void WavTriggerSetup()
     wavSerial.begin(57600);
     delay(2000);
     wavTrigger.AmpPower(false);
-    masterVolume = 50;
+    masterVolume = 100;
     wavTrigger.SetMasterVolume(masterVolume);
     enteringWAVCode = false;
 }
