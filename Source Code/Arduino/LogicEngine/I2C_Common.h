@@ -39,7 +39,8 @@ struct I2C_PSI_Mode {
 struct I2C_Logic_Mode {
     enum Value {
         Normal = 0,
-        March = 1
+        MarchTogether = 1,
+        MarchSeparate = 2
     };
 };
 

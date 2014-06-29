@@ -26,7 +26,8 @@ void loop() {
     psi.update();
     logicDisplay.update();
     
-//    logicDisplay.setMode(I2C_Logic_Mode::March);
+    psi.setMode(I2C_PSI_Mode::March);
+    logicDisplay.setMode(I2C_Logic_Mode::MarchSeparate);
 }
 
 void receiveEvent(int eventCode) {

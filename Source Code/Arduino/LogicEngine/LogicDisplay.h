@@ -60,8 +60,9 @@ class LogicDisplay {
         
         void animateNormal();
         
-        // march
-        void animateMarch();
+        // march together
+        void animateMarchTogether();
+        void animateMarchSeparate();
         bool firstColor;
     
     public:

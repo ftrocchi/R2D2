@@ -55,8 +55,12 @@ void LogicDisplay::update() {
             animateNormal();
             break;
             
-        case I2C_Logic_Mode::March:
-            animateMarch();
+        case I2C_Logic_Mode::MarchTogether:
+            animateMarchTogether();
+            break;
+            
+        case I2C_Logic_Mode::MarchSeparate:
+            animateMarchSeparate();
             break;
     }        
 }
@@ -207,8 +211,7 @@ void LogicDisplay::updateLed(byte ledNum, byte hueVal) {
 // ----------------------------------------------------------------------------
 // MARCH
 // ----------------------------------------------------------------------------
-void LogicDisplay::animateMarch()
-{
+void LogicDisplay::animateMarchTogether() {
     if (!IsTimeForStateChange(250))
         return;
 
@@ -224,6 +227,27 @@ void LogicDisplay::animateMarch()
         FastLED.show();      
     }
 
+    firstColor = !firstColor;
+}
+
+void LogicDisplay::animateMarchSeparate() {
+    if (!IsTimeForStateChange(250))
+        return;
+        
+    if (isRLD) {
+        // TODO 
+    } else {
+        for (byte x=0; x<80; x++) {
+            if (x < 48)
+                leds[pgm_read_byte(&fldMap[x])] = firstColor ? primaryColor : CRGB::Black;
+            else
+                leds[pgm_read_byte(&fldMap[x])] = !firstColor ? primaryColor : CRGB::Black;
+        }
+    }
+    
+    FastLED.show();      
+    
+    
     firstColor = !firstColor;
 }
 
