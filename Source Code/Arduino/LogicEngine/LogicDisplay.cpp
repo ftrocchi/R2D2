@@ -55,12 +55,12 @@ void LogicDisplay::update() {
             animateNormal();
             break;
             
-        case I2C_Logic_Mode::MarchTogether:
-            animateMarchTogether();
+        case I2C_Logic_Mode::FLD_March_Together:
+            animateFLDMarchTogether();
             break;
             
-        case I2C_Logic_Mode::MarchSeparate:
-            animateMarchSeparate();
+        case I2C_Logic_Mode::FLD_March_Separate:
+            animateFLDMarchSeparate();
             break;
     }        
 }
@@ -211,7 +211,7 @@ void LogicDisplay::updateLed(byte ledNum, byte hueVal) {
 // ----------------------------------------------------------------------------
 // MARCH
 // ----------------------------------------------------------------------------
-void LogicDisplay::animateMarchTogether() {
+void LogicDisplay::animateFLDMarchTogether() {
     if (!IsTimeForStateChange(250))
         return;
 
@@ -230,7 +230,7 @@ void LogicDisplay::animateMarchTogether() {
     firstColor = !firstColor;
 }
 
-void LogicDisplay::animateMarchSeparate() {
+void LogicDisplay::animateFLDMarchSeparate() {
     if (!IsTimeForStateChange(250))
         return;
         
