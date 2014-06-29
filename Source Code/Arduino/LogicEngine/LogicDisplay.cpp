@@ -54,6 +54,10 @@ void LogicDisplay::update() {
         case I2C_Logic_Mode::Normal:
             animateNormal();
             break;
+            
+        case I2C_Logic_Mode::March:
+            animateMarch();
+            break;
     }        
 }
 
@@ -199,6 +203,47 @@ void LogicDisplay::updateLed(byte ledNum, byte hueVal) {
         }
     }
 }
+
+// ----------------------------------------------------------------------------
+// MARCH
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateMarch()
+{
+    if (!IsTimeForStateChange(250))
+        return;
+
+    if (firstColor)
+        clear();
+    else
+    {
+        for(byte x=0;x<96;x++) 
+            if (isRLD)
+                leds[pgm_read_byte(&rldMap[x])] = primaryColor;
+            else if (x<80)
+                leds[pgm_read_byte(&fldMap[x])] = primaryColor;
+        FastLED.show();      
+    }
+
+    firstColor = !firstColor;
+}
+
+bool LogicDisplay::IsTimeForStateChange(int delay)
+{
+    unsigned long timeNow = millis();
+  
+    // early exit if we don't need to do anything
+    if (timeNow - lastTimeCheck < delay)
+        return false;
+
+    // set the time  
+    lastTimeCheck = timeNow;
+
+    // clear the device
+    clear();
+
+    return true;
+}
+
 
 
 

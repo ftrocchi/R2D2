@@ -48,15 +48,21 @@ class LogicDisplay {
         bool isModeActive;
         I2C_Logic_Mode::Value currentMode;
         CRGB primaryColor;
+        unsigned long lastTimeCheck;
         
         void generateAllColors();
         void updateLed(byte ledNum, byte hueVal);
         void setInitialColors();
         void showStartupAnimation();
         void clear();
+        bool IsTimeForStateChange(int delay);
+        
         
         void animateNormal();
         
+        // march
+        void animateMarch();
+        bool firstColor;
     
     public:
         void setup(I2C_Device_Address::Value address, bool isRLDLogic);
