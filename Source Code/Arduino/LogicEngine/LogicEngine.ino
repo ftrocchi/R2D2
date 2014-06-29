@@ -20,6 +20,7 @@ void setup() {
     psi.setup(address, isRLD);
     
     Wire.onReceive(receiveEvent);
+    logicDisplay.setMode(I2C_Logic_Display_Selection::All, I2C_Logic_Mode::March_Separate);
 }
 
 void loop() {
@@ -27,8 +28,6 @@ void loop() {
     logicDisplay.update();
     
 //    psi.setMode(I2C_PSI_Mode::Spin);
-    logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBoth, I2C_Logic_Mode::March);
-
 }
 
 void receiveEvent(int eventCode) {

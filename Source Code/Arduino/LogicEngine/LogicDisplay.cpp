@@ -62,26 +62,10 @@ void LogicDisplay::update() {
             break;
             
         case I2C_Logic_Mode::March:
+        case I2C_Logic_Mode::March_Separate:
             animateMarch(TOP_FLD_RLD);
             break;
             
-/*            
-        case I2C_Logic_Mode::FLD_March_Together:
-            animateFLDMarchTogether();
-            break;
-            
-        case I2C_Logic_Mode::FLD_March_Separate:
-            animateFLDMarchSeparate();
-            break;
-            
-        case I2C_Logic_Mode::RLD_March:
-            animateRLDMarch();
-            break;
-            
-        case I2C_Logic_Mode::FLD_Spin_Clockwise_Separate:
-            animateFLDSpinClockwiseSeparate();
-            break;
-            */
     }        
     
     // if this is FLD, then also a mode for bottom
@@ -101,13 +85,12 @@ void LogicDisplay::update() {
                 break;
                 
             case I2C_Logic_Mode::March:
+            case I2C_Logic_Mode::March_Separate:
                 animateMarch(BOTTOM_FLD);
                 break;
         }
     }
-    
 }
-
 
 void LogicDisplay::generateAllColors() {
     byte val;
@@ -191,6 +174,16 @@ void LogicDisplay::setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic
         
     if (display == I2C_Logic_Display_Selection::FLDBottom || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::All)
         currentMode[BOTTOM_FLD] = mode;
+        
+    // special handling for March
+    if (currentMode[TOP_FLD_RLD] == I2C_Logic_Mode::March || currentMode[TOP_FLD_RLD] == I2C_Logic_Mode::March_Separate)
+        marchState[TOP_FLD_RLD] = true;
+        
+    if (currentMode[BOTTOM_FLD] == I2C_Logic_Mode::March)
+        marchState[BOTTOM_FLD] = true;
+        
+    if (currentMode[BOTTOM_FLD] == I2C_Logic_Mode::March_Separate)
+        marchState[BOTTOM_FLD] = false;
 }
 
 // ----------------------------------------------------------------------------
