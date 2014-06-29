@@ -15,10 +15,12 @@ void LogicDisplay::setup(I2C_Device_Address::Value address, bool isRLDLogic) {
         tweenPause = 40;
         keyPause = 1200;
         keys = sizeof(rldColors) / 3;
+        primaryColor.setHSV(rldColors[2][0], rldColors[2][1], rldColors[2][2]);  // green
     } else {
         tweenPause = 7;
         keyPause = 350;
         keys = sizeof(fldColors) / 3;
+        primaryColor.setHSV(fldColors[3][0], fldColors[3][1], fldColors[3][2]);  // blue
     }
     
     totalColors = keys * tweens;
@@ -126,9 +128,12 @@ void LogicDisplay::clear() {
 // ----------------------------------------------------------------------------
 void LogicDisplay::on() {
     isModeActive = false;
+    
     for(byte x=0;x<96;x++) 
-        if (isRLD) leds[x] = CRGB::Green;
-        else leds[x] = CRGB::Blue;
+        if (isRLD)
+            leds[pgm_read_byte(&rldMap[x])] = primaryColor;
+        else if (x<80)
+            leds[pgm_read_byte(&fldMap[x])] = primaryColor;
     FastLED.show();      
 }
 

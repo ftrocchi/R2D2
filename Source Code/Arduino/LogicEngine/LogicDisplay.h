@@ -9,8 +9,8 @@
 #define SPEEDPIN 3
 #define DATA_PIN 6
 
-const byte fldColors[6][3]PROGMEM = { {170,0,0} , {170,255,54} , {170,255,120} , {166,255,200} , {154,84,150} , {174,0,200} };
-const byte rldColors[5][3]PROGMEM = { {87,0,0} , {87,206,105} , {79,255,184} , {18,255,250} , {0,255,214} };
+const byte fldColors[6][3]PROGMEM = { {170,0,0} , {170,255,54} , {170,255,120} , {166,255,200} , {154,84,150} , {174,0,200} }; // black, dark blue, medium blue, blue, bright grey, white
+const byte rldColors[5][3]PROGMEM = { {87,0,0} , {87,206,105} , {79,255,184} , {18,255,250} , {0,255,214} };  // black, dark green, green, yellow, red
 const byte tweens = 6;
 const byte rldMap[]PROGMEM = {
  0, 1, 2, 3, 4, 5, 6, 7,48,49,50,51,52,53,54,55,
@@ -47,6 +47,7 @@ class LogicDisplay {
         byte hueVal;
         bool isModeActive;
         I2C_Logic_Mode::Value currentMode;
+        CRGB primaryColor;
         
         void generateAllColors();
         void updateLed(byte ledNum, byte hueVal);

@@ -25,6 +25,8 @@ void setup() {
 void loop() {
     psi.update();
     logicDisplay.update();
+    
+    logicDisplay.on();
 }
 
 void receiveEvent(int eventCode) {
