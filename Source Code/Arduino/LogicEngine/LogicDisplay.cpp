@@ -15,7 +15,7 @@ void LogicDisplay::setup(I2C_Device_Address::Value address, bool isRLDLogic) {
         tweenPause = 40;
         keyPause = 1200;
         keys = sizeof(rldColors) / 3;
-        primaryColor.setHSV(rldColors[2][0], rldColors[2][1], rldColors[2][2]);  // green
+        primaryColor.setHSV(rldColors[1][0], rldColors[1][1], rldColors[1][2]);  // green
     } else {
         tweenPause = 7;
         keyPause = 350;
@@ -61,6 +61,10 @@ void LogicDisplay::update() {
             
         case I2C_Logic_Mode::FLD_March_Separate:
             animateFLDMarchSeparate();
+            break;
+            
+        case I2C_Logic_Mode::RLD_March:
+            animateRLDMarch();
             break;
     }        
 }
@@ -219,11 +223,8 @@ void LogicDisplay::animateFLDMarchTogether() {
         clear();
     else
     {
-        for(byte x=0;x<96;x++) 
-            if (isRLD)
-                leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-            else if (x<80)
-                leds[pgm_read_byte(&fldMap[x])] = primaryColor;
+        for(byte x=0;x<80;x++) 
+            leds[pgm_read_byte(&fldMap[x])] = primaryColor;
         FastLED.show();      
     }
 
@@ -234,20 +235,31 @@ void LogicDisplay::animateFLDMarchSeparate() {
     if (!IsTimeForStateChange(250))
         return;
         
-    if (isRLD) {
-        // TODO 
-    } else {
-        for (byte x=0; x<80; x++) {
-            if (x < 48)
-                leds[pgm_read_byte(&fldMap[x])] = firstColor ? primaryColor : CRGB::Black;
-            else
-                leds[pgm_read_byte(&fldMap[x])] = !firstColor ? primaryColor : CRGB::Black;
-        }
+    for (byte x=0; x<80; x++) {
+        if (x < 48)
+            leds[pgm_read_byte(&fldMap[x])] = firstColor ? primaryColor : CRGB::Black;
+        else
+            leds[pgm_read_byte(&fldMap[x])] = !firstColor ? primaryColor : CRGB::Black;
     }
     
     FastLED.show();      
     
-    
+    firstColor = !firstColor;
+}
+
+void LogicDisplay::animateRLDMarch() {
+    if (!IsTimeForStateChange(250))
+        return;
+
+    if (firstColor)
+        clear();
+    else
+    {
+        for(byte x=0;x<96;x++) 
+            leds[pgm_read_byte(&rldMap[x])] = primaryColor;
+        FastLED.show();      
+    }
+
     firstColor = !firstColor;
 }
 

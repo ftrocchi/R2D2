@@ -60,9 +60,10 @@ class LogicDisplay {
         
         void animateNormal();
         
-        // march together
+        // march
         void animateFLDMarchTogether();
         void animateFLDMarchSeparate();
+        void animateRLDMarch();
         bool firstColor;
     
     public:

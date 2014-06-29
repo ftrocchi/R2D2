@@ -40,7 +40,8 @@ struct I2C_Logic_Mode {
     enum Value {
         Normal = 0,
         FLD_March_Together = 1,
-        FLD_March_Separate = 2
+        FLD_March_Separate = 2,
+        RLD_March = 3
     };
 };
 
