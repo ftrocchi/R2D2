@@ -8,6 +8,8 @@
 
 #define SPEEDPIN 3
 #define DATA_PIN 6
+#define TOP_FLD_RLD 0
+#define BOTTOM_FLD 1
 
 const byte fldColors[6][3]PROGMEM = { {170,0,0} , {170,255,54} , {170,255,120} , {166,255,200} , {154,84,150} , {174,0,200} }; // black, dark blue, medium blue, blue, bright grey, white
 const byte rldColors[5][3]PROGMEM = { {87,0,0} , {87,206,105} , {79,255,184} , {18,255,250} , {0,255,214} };  // black, dark green, green, yellow, red
@@ -45,8 +47,8 @@ class LogicDisplay {
         CRGB leds[96];
         byte LEDstat[96][3];
         byte hueVal;
-        bool isModeActive;
-        I2C_Logic_Mode::Value currentMode;
+        
+        I2C_Logic_Mode::Value currentMode[2]; // 0 = top / rld, 1 = bottom
         CRGB primaryColor;
         unsigned long lastTimeCheck;
         
@@ -54,17 +56,26 @@ class LogicDisplay {
         void updateLed(byte ledNum, byte hueVal);
         void setInitialColors();
         void showStartupAnimation();
-        void clear();
+        void clear(byte isTopOrBottom);
         bool IsTimeForStateChange(int delay);
         
+        // on mode
+        void animateOn(byte isTopOrBottom);
         
-        void animateNormal();
+        // off mode
+        void animateOff(byte isTopOrBottom);
+        
+        // normal mode
+        void animateNormal(byte isTopOrBottom);
         
         // march
         void animateFLDMarchTogether();
         void animateFLDMarchSeparate();
         void animateRLDMarch();
         bool firstColor;
+        
+        // spin
+        void animateFLDSpinClockwiseSeparate();
     
     public:
         void setup(I2C_Device_Address::Value address, bool isRLDLogic);
@@ -72,10 +83,8 @@ class LogicDisplay {
         void update();
         void processCommand();
         
-        void on();
-        void off();
         void setBrightness(byte brightness);
-        void setMode(I2C_Logic_Mode::Value mode);
+        void setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic_Mode::Value mode);
 };
 
 #endif

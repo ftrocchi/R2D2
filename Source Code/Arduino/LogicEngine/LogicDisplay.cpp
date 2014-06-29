@@ -4,7 +4,7 @@ void LogicDisplay::setup(I2C_Device_Address::Value address, bool isRLDLogic) {
     i2cAddress = address;
     isRLD = isRLDLogic;
     
-    setMode(I2C_Logic_Mode::Normal);
+    setMode(I2C_Logic_Display_Selection::All, I2C_Logic_Mode::Normal);
     setBrightness(255);
     FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, 96);
       
@@ -30,7 +30,8 @@ void LogicDisplay::setup(I2C_Device_Address::Value address, bool isRLDLogic) {
     
     generateAllColors();
     
-    clear();
+    clear(TOP_FLD_RLD);
+    clear(BOTTOM_FLD);
 
     // RLD TEST PATTERN HERE
     
@@ -46,15 +47,21 @@ void LogicDisplay::processCommand() {
 void LogicDisplay::update() {
     // LOOPCHECK HERE
     
-    if (!isModeActive)
-        return;
-
-    switch (currentMode)
+    switch (currentMode[TOP_FLD_RLD])
     {
-        case I2C_Logic_Mode::Normal:
-            animateNormal();
+        case I2C_Logic_Mode::On:
+            animateOn(TOP_FLD_RLD);
             break;
             
+        case I2C_Logic_Mode::Off:
+            animateOff(TOP_FLD_RLD);
+            break;            
+            
+        case I2C_Logic_Mode::Normal:
+            animateNormal(TOP_FLD_RLD);
+            break;
+            
+/*            
         case I2C_Logic_Mode::FLD_March_Together:
             animateFLDMarchTogether();
             break;
@@ -66,7 +73,34 @@ void LogicDisplay::update() {
         case I2C_Logic_Mode::RLD_March:
             animateRLDMarch();
             break;
+            
+        case I2C_Logic_Mode::FLD_Spin_Clockwise_Separate:
+            animateFLDSpinClockwiseSeparate();
+            break;
+            */
     }        
+    
+    // if this is FLD, then also a mode for bottom
+    if (!isRLD) {
+        switch (currentMode[BOTTOM_FLD])
+        {
+            case I2C_Logic_Mode::On:
+                animateOn(BOTTOM_FLD);
+                break;
+    
+            case I2C_Logic_Mode::Off:
+                animateOff(BOTTOM_FLD);
+                break;            
+    
+            case I2C_Logic_Mode::Normal:
+                animateNormal(BOTTOM_FLD);
+                break;
+                
+
+                
+        }
+    }
+    
 }
 
 
@@ -129,15 +163,20 @@ void LogicDisplay::showStartupAnimation() {
     }
 }
 
-void LogicDisplay::clear() {
+void LogicDisplay::clear(byte isTopOrBottom) {
     for(byte x=0;x<96;x++) 
-        leds[x] = CRGB::Black;
-    FastLED.show();      
+        if (isRLD) 
+            leds[pgm_read_byte(&rldMap[x])] = CRGB::Black;
+        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+            leds[pgm_read_byte(&fldMap[x])] = CRGB::Black;
+            
+    FastLED.show();           
 }
 
 // ----------------------------------------------------------------------------
 // COMMANDS
 // ----------------------------------------------------------------------------
+/*
 void LogicDisplay::on() {
     isModeActive = false;
     
@@ -153,29 +192,53 @@ void LogicDisplay::off() {
     isModeActive = false;
     clear();
 }
-
+*/
 void LogicDisplay::setBrightness(byte brightness) {
     FastLED.setBrightness(brightness);
 }
 
-void LogicDisplay::setMode(I2C_Logic_Mode::Value mode) {
-    isModeActive = true;
-    currentMode = mode;
+void LogicDisplay::setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic_Mode::Value mode) {
+    if (display == I2C_Logic_Display_Selection::FLDTop || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::RLD || display == I2C_Logic_Display_Selection::All)
+        currentMode[TOP_FLD_RLD] = mode;
+        
+    if (display == I2C_Logic_Display_Selection::FLDBottom || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::All)
+        currentMode[BOTTOM_FLD] = mode;
 }
 
 // ----------------------------------------------------------------------------
 // MODES
 // ----------------------------------------------------------------------------
+// ON
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateOn(byte isTopOrBottom) {
+    for(byte x=0;x<96;x++) 
+        if (isRLD) 
+            leds[pgm_read_byte(&rldMap[x])] = primaryColor;
+        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+            leds[pgm_read_byte(&fldMap[x])] = primaryColor;
+            
+    FastLED.show();         
+}
+
+// ----------------------------------------------------------------------------
+// OFF
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateOff(byte isTopOrBottom) {
+    clear(isTopOrBottom);
+}
+
+// ----------------------------------------------------------------------------
 // NORMAL
 // ----------------------------------------------------------------------------
-void LogicDisplay::animateNormal() {
+void LogicDisplay::animateNormal(byte isTopOrBottom) {
     hueVal = round(analogRead(A3)/4);
-    for (byte ledNum=0; ledNum<96; ledNum++)
-        if (isRLD)
+    
+    for (byte ledNum = 0; ledNum<96; ledNum++) 
+        if (isRLD) 
             updateLed(pgm_read_byte(&rldMap[ledNum]), hueVal);
-        else if (ledNum < 80) 
+        else if (ledNum < 80 && ((isTopOrBottom == TOP_FLD_RLD && ledNum < 48) || (isTopOrBottom == BOTTOM_FLD && ledNum >= 48)))
             updateLed(pgm_read_byte(&fldMap[ledNum]), hueVal);
-            
+    
     FastLED.show();         
 }
 
@@ -211,7 +274,7 @@ void LogicDisplay::updateLed(byte ledNum, byte hueVal) {
         }
     }
 }
-
+/*
 // ----------------------------------------------------------------------------
 // MARCH
 // ----------------------------------------------------------------------------
@@ -263,6 +326,12 @@ void LogicDisplay::animateRLDMarch() {
     firstColor = !firstColor;
 }
 
+// ----------------------------------------------------------------------------
+// RING
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateFLDSpinClockwiseSeparate() {
+}
+
 bool LogicDisplay::IsTimeForStateChange(int delay)
 {
     unsigned long timeNow = millis();
@@ -281,6 +350,6 @@ bool LogicDisplay::IsTimeForStateChange(int delay)
 }
 
 
-
+*/
 
 
