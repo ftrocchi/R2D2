@@ -27,7 +27,7 @@ void loop() {
     logicDisplay.update();
     
 //    psi.setMode(I2C_PSI_Mode::Spin);
-    logicDisplay.setMode(I2C_Logic_Display_Selection::FLDTop, I2C_Logic_Mode::Off);
+    logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBoth, I2C_Logic_Mode::March);
 
 }
 

@@ -61,6 +61,10 @@ void LogicDisplay::update() {
             animateNormal(TOP_FLD_RLD);
             break;
             
+        case I2C_Logic_Mode::March:
+            animateMarch(TOP_FLD_RLD);
+            break;
+            
 /*            
         case I2C_Logic_Mode::FLD_March_Together:
             animateFLDMarchTogether();
@@ -96,8 +100,9 @@ void LogicDisplay::update() {
                 animateNormal(BOTTOM_FLD);
                 break;
                 
-
-                
+            case I2C_Logic_Mode::March:
+                animateMarch(BOTTOM_FLD);
+                break;
         }
     }
     
@@ -176,23 +181,6 @@ void LogicDisplay::clear(byte isTopOrBottom) {
 // ----------------------------------------------------------------------------
 // COMMANDS
 // ----------------------------------------------------------------------------
-/*
-void LogicDisplay::on() {
-    isModeActive = false;
-    
-    for(byte x=0;x<96;x++) 
-        if (isRLD)
-            leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-        else if (x<80)
-            leds[pgm_read_byte(&fldMap[x])] = primaryColor;
-    FastLED.show();      
-}
-
-void LogicDisplay::off() {
-    isModeActive = false;
-    clear();
-}
-*/
 void LogicDisplay::setBrightness(byte brightness) {
     FastLED.setBrightness(brightness);
 }
@@ -274,82 +262,44 @@ void LogicDisplay::updateLed(byte ledNum, byte hueVal) {
         }
     }
 }
-/*
+
 // ----------------------------------------------------------------------------
 // MARCH
 // ----------------------------------------------------------------------------
-void LogicDisplay::animateFLDMarchTogether() {
-    if (!IsTimeForStateChange(250))
-        return;
-
-    if (firstColor)
-        clear();
-    else
-    {
-        for(byte x=0;x<80;x++) 
-            leds[pgm_read_byte(&fldMap[x])] = primaryColor;
-        FastLED.show();      
-    }
-
-    firstColor = !firstColor;
-}
-
-void LogicDisplay::animateFLDMarchSeparate() {
-    if (!IsTimeForStateChange(250))
+void LogicDisplay::animateMarch(byte isTopOrBottom) {
+    if (!IsTimeForStateChange(isTopOrBottom, 250))
         return;
         
-    for (byte x=0; x<80; x++) {
-        if (x < 48)
-            leds[pgm_read_byte(&fldMap[x])] = firstColor ? primaryColor : CRGB::Black;
-        else
-            leds[pgm_read_byte(&fldMap[x])] = !firstColor ? primaryColor : CRGB::Black;
-    }
-    
-    FastLED.show();      
-    
-    firstColor = !firstColor;
-}
-
-void LogicDisplay::animateRLDMarch() {
-    if (!IsTimeForStateChange(250))
-        return;
-
-    if (firstColor)
-        clear();
-    else
-    {
+    if (marchState[isTopOrBottom])
+        clear(isTopOrBottom);
+    else {
         for(byte x=0;x<96;x++) 
-            leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-        FastLED.show();      
+            if (isRLD) 
+                leds[pgm_read_byte(&rldMap[x])] = primaryColor;
+            else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+                leds[pgm_read_byte(&fldMap[x])] = primaryColor;
+                
+        FastLED.show();
     }
-
-    firstColor = !firstColor;
+    
+    marchState[isTopOrBottom] = !marchState[isTopOrBottom];
 }
 
-// ----------------------------------------------------------------------------
-// RING
-// ----------------------------------------------------------------------------
-void LogicDisplay::animateFLDSpinClockwiseSeparate() {
-}
-
-bool LogicDisplay::IsTimeForStateChange(int delay)
+bool LogicDisplay::IsTimeForStateChange(byte isTopOrBottom, int delay)
 {
     unsigned long timeNow = millis();
   
     // early exit if we don't need to do anything
-    if (timeNow - lastTimeCheck < delay)
+    if (timeNow - lastTimeCheck[isTopOrBottom] < delay)
         return false;
 
     // set the time  
-    lastTimeCheck = timeNow;
+    lastTimeCheck[isTopOrBottom] = timeNow;
 
     // clear the device
-    clear();
+    clear(isTopOrBottom);
 
     return true;
 }
-
-
-*/
 
 

@@ -50,14 +50,14 @@ class LogicDisplay {
         
         I2C_Logic_Mode::Value currentMode[2]; // 0 = top / rld, 1 = bottom
         CRGB primaryColor;
-        unsigned long lastTimeCheck;
+        unsigned long lastTimeCheck[2];
         
         void generateAllColors();
         void updateLed(byte ledNum, byte hueVal);
         void setInitialColors();
         void showStartupAnimation();
         void clear(byte isTopOrBottom);
-        bool IsTimeForStateChange(int delay);
+        bool IsTimeForStateChange(byte isTopOrBottom, int delay);
         
         // on mode
         void animateOn(byte isTopOrBottom);
@@ -69,14 +69,9 @@ class LogicDisplay {
         void animateNormal(byte isTopOrBottom);
         
         // march
-        void animateFLDMarchTogether();
-        void animateFLDMarchSeparate();
-        void animateRLDMarch();
-        bool firstColor;
+        void animateMarch(byte isTopOrBottom);
+        bool marchState[2];
         
-        // spin
-        void animateFLDSpinClockwiseSeparate();
-    
     public:
         void setup(I2C_Device_Address::Value address, bool isRLDLogic);
         
