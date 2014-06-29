@@ -3,8 +3,7 @@
 const int PSI::patternAtStage[9] = { 
     B01010101, B11010101, B10010101, B10110101, B10101010, B00101010, B01101010, B01010101, B01010101 };
 
-PSI::PSI(I2C_DeviceAddress::Value address, LedControl *led, int first, int second, int transition) {
-    i2cAddress = address;
+PSI::PSI(LedControl *led) {
     ledControl = led;
     
     currentMode = I2C_PSI_Mode::Normal;
@@ -13,8 +12,48 @@ PSI::PSI(I2C_DeviceAddress::Value address, LedControl *led, int first, int secon
     ledControl->shutdown(0, false);
     ledControl->clearDisplay(0);
     ledControl->setIntensity(0, 15);    
+}
 
-    resetModes(first, second, transition);
+void PSI::setup(I2C_Device_Address::Value address, bool isRLDPSI) 
+{
+    int transition = 125;
+    int first = isRLDPSI ? 2500 : 1700;
+    int second = isRLDPSI ? 1700 : 2500;
+    
+    i2cAddress = address;
+
+    delayAtStage[0] = first;
+    delayAtStage[1] = transition / 3; 
+    delayAtStage[2] = delayAtStage[1];
+    delayAtStage[3] = delayAtStage[1]; 
+    delayAtStage[4] = second; 
+    delayAtStage[5] = delayAtStage[1]; 
+    delayAtStage[6] = delayAtStage[1]; 
+    delayAtStage[7] = delayAtStage[1]; 
+    delayAtStage[8] = first; 
+  
+    stage = 0;
+    slideDirection = 1;
+    maxStage = 8;
+    lastTimeCheck = 0;
+
+    // march
+    firstColor = true;
+
+    // spin
+    spinState = 0;
+
+    // ring
+    ringState = 0;
+    ringDirection = 1;
+
+    // up down
+    upDownState = 0;
+    upDownDirection = 1;
+
+    // left right
+    leftRightState = 0;
+    leftRightDirection = 1;
 }
 
 void PSI::processCommand() {
@@ -105,41 +144,7 @@ void PSI::setMode(I2C_PSI_Mode::Value mode)
 // ----------------------------------------------------------------------------
 // NORMAL
 // ----------------------------------------------------------------------------
-void PSI::resetModes(int first, int second, int transition) 
-{
-    delayAtStage[0] = first;
-    delayAtStage[1] = transition / 3; 
-    delayAtStage[2] = delayAtStage[1];
-    delayAtStage[3] = delayAtStage[1]; 
-    delayAtStage[4] = second; 
-    delayAtStage[5] = delayAtStage[1]; 
-    delayAtStage[6] = delayAtStage[1]; 
-    delayAtStage[7] = delayAtStage[1]; 
-    delayAtStage[8] = first; 
-  
-    stage = 0;
-    slideDirection = 1;
-    maxStage = 8;
-    lastTimeCheck = 0;
 
-    // march
-    firstColor = true;
-
-    // spin
-    spinState = 0;
-
-    // ring
-    ringState = 0;
-    ringDirection = 1;
-
-    // up down
-    upDownState = 0;
-    upDownDirection = 1;
-
-    // left right
-    leftRightState = 0;
-    leftRightDirection = 1;
-}
 
 void PSI::animateNormal() 
 {

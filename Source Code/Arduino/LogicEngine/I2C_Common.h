@@ -1,7 +1,7 @@
 #ifndef __I2C_COMMON_H__
 #define __I2C_COMMON_H__
 
-struct I2C_DeviceAddress {
+struct I2C_Device_Address {
     enum Value {
         RearLogicDisplay = 10,
         FrontLogicDisplay = 11,

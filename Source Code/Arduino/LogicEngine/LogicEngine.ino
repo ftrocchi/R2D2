@@ -1,24 +1,30 @@
 #include <Wire.h>
 #include <LedControl.h>
+#include <FastSPI_LED2.h>
+#include <avr/pgmspace.h>
 #include "I2C_Common.h"
 #include "PSI.h"
+#include "LogicDisplay.h"
 
-#define FLD
+#define TOGGLEPIN 4
 
-LedControl ledControl = LedControl(7, 8, 9, 1);
-
-#ifdef FLD
-    PSI psi(I2C_DeviceAddress::FrontLogicDisplay, &ledControl, 1000, 2000, 200);
-#else    
-    PSI psi(I2C_DeviceAddress::RearLogicDisplay, &ledControl, 2000, 1000, 200);
-#endif
+LedControl psiLedControl = LedControl(7, 8, 9, 1);
+PSI psi(&psiLedControl);
+LogicDisplay logicDisplay;
 
 void setup() {
+    bool isRLD = isTogglePinHigh();
+    I2C_Device_Address::Value address = isRLD ? I2C_Device_Address::RearLogicDisplay : I2C_Device_Address::FrontLogicDisplay;
+    
+    logicDisplay.setup(address, isRLD);
+    psi.setup(address, isRLD);
+    
     Wire.onReceive(receiveEvent);
 }
 
 void loop() {
     psi.update();
+    logicDisplay.update();
 }
 
 void receiveEvent(int eventCode) {
@@ -26,5 +32,13 @@ void receiveEvent(int eventCode) {
     
     if (logicDevice == I2C_Logic_Device::PSI)
         psi.processCommand();
+        
+    if (logicDevice == I2C_Logic_Device::Logic)
+        logicDisplay.processCommand();
+}
+
+bool isTogglePinHigh() {
+    pinMode(TOGGLEPIN, INPUT);
+    return digitalRead(TOGGLEPIN) == HIGH;
 }
 

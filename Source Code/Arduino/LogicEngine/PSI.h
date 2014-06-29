@@ -9,14 +9,13 @@ class PSI {
     private:
         static const int patternAtStage[9];
         LedControl *ledControl;
-        I2C_DeviceAddress::Value i2cAddress;
+        I2C_Device_Address::Value i2cAddress;
         unsigned long lastTimeCheck;
         I2C_PSI_Mode::Value currentMode;
         bool isModeActive;
         bool IsTimeForStateChange(int delay);
         
         // normal
-        void resetModes(int first, int second, int transition);
         void animateNormal();
         int delayAtStage[9];
         int stage;
@@ -47,7 +46,8 @@ class PSI {
         int leftRightDirection;
         
     public:
-        PSI(I2C_DeviceAddress::Value address, LedControl *led, int first, int second, int transition);
+        PSI(LedControl *led);
+        void setup(I2C_Device_Address::Value address, bool isRLDPSI);
         
         void update();
         void processCommand();
