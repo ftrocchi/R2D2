@@ -41,4 +41,3 @@ bool isTogglePinHigh() {
     pinMode(TOGGLEPIN, INPUT);
     return digitalRead(TOGGLEPIN) == HIGH;
 }
-

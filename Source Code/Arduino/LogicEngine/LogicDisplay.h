@@ -45,15 +45,28 @@ class LogicDisplay {
         CRGB leds[96];
         byte LEDstat[96][3];
         byte hueVal;
+        bool isModeActive;
+        I2C_Logic_Mode::Value currentMode;
         
         void generateAllColors();
         void updateLed(byte ledNum, byte hueVal);
+        void setInitialColors();
+        void showStartupAnimation();
+        void clear();
+        
+        void animateNormal();
+        
     
     public:
         void setup(I2C_Device_Address::Value address, bool isRLDLogic);
         
         void update();
         void processCommand();
+        
+        void on();
+        void off();
+        void setBrightness(byte brightness);
+        void setMode(I2C_Logic_Mode::Value mode);
 };
 
 #endif
