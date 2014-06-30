@@ -170,7 +170,7 @@ void LogicDisplay::clear(byte isTopOrBottom) {
     for(byte x=0;x<96;x++) 
         if (isRLD) 
             leds[pgm_read_byte(&rldMap[x])] = CRGB::Black;
-        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 40) || (isTopOrBottom == BOTTOM_FLD && x >= 40)))
             leds[pgm_read_byte(&fldMap[x])] = CRGB::Black;
             
     FastLED.show();           
@@ -231,7 +231,7 @@ void LogicDisplay::animateOn(byte isTopOrBottom) {
     for(byte x=0;x<96;x++) 
         if (isRLD) 
             leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 40) || (isTopOrBottom == BOTTOM_FLD && x >= 40)))
             leds[pgm_read_byte(&fldMap[x])] = primaryColor;
             
     FastLED.show();         
@@ -253,7 +253,7 @@ void LogicDisplay::animateNormal(byte isTopOrBottom) {
     for (byte ledNum = 0; ledNum<96; ledNum++) 
         if (isRLD) 
             updateLed(pgm_read_byte(&rldMap[ledNum]), hueVal);
-        else if (ledNum < 80 && ((isTopOrBottom == TOP_FLD_RLD && ledNum < 48) || (isTopOrBottom == BOTTOM_FLD && ledNum >= 48)))
+        else if (ledNum < 80 && ((isTopOrBottom == TOP_FLD_RLD && ledNum < 40) || (isTopOrBottom == BOTTOM_FLD && ledNum >= 40)))
             updateLed(pgm_read_byte(&fldMap[ledNum]), hueVal);
     
     FastLED.show();         
@@ -305,7 +305,7 @@ void LogicDisplay::animateMarch(byte isTopOrBottom) {
         for(byte x=0;x<96;x++) 
             if (isRLD) 
                 leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-            else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+            else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 40) || (isTopOrBottom == BOTTOM_FLD && x >= 40)))
                 leds[pgm_read_byte(&fldMap[x])] = primaryColor;
                 
         FastLED.show();
@@ -318,13 +318,13 @@ void LogicDisplay::animateMarch(byte isTopOrBottom) {
 // COLR SHIFT
 // ----------------------------------------------------------------------------
 void LogicDisplay::animateColorShift(byte isTopOrBottom) {
-    if (!IsTimeForStateChange(isTopOrBottom, 150, false))
+    if (!IsTimeForStateChange(isTopOrBottom, 25, false))
         return;
         
     for(byte x=0;x<96;x++) 
         if (isRLD) 
             leds[pgm_read_byte(&rldMap[x])].setHSV(colorShiftHue[isTopOrBottom], 255, 255);
-        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 40) || (isTopOrBottom == BOTTOM_FLD && x >= 40)))
             leds[pgm_read_byte(&fldMap[x])].setHSV(colorShiftHue[isTopOrBottom], 255, 255);
             
     colorShiftHue[isTopOrBottom]++;

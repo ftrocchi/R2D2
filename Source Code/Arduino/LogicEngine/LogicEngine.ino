@@ -24,7 +24,9 @@ void setup() {
 //    logicDisplay.setText(I2C_Logic_Display_Selection::FLDTop, "HELLO R2 BUILDERS!");
 //    logicDisplay.setText(I2C_Logic_Display_Selection::FLDBottom, "MIDWESTR2.COM");
 //    logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBoth, I2C_Logic_Mode::Text);
-        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBoth, I2C_Logic_Mode::Color_Shift);
+    
+        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDTop, I2C_Logic_Mode::Color_Shift);
+        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBottom, I2C_Logic_Mode::March);
 }
 
 void loop() {
