@@ -119,6 +119,10 @@ class LogicDisplay {
         void animateMarch(byte isTopOrBottom);
         bool marchState[2];
         
+        // color shift
+        void animateColorShift(byte isTopOrBottom);
+        byte colorShiftHue[2];
+        
         // text
         void animateText(byte isTopOrBottom);
         byte getLetterIndex(char letter);

@@ -60,6 +60,7 @@ struct I2C_Logic_Mode {
         Normal = 2,
         March = 3,
         March_Separate = 4,
+        Color_Shift = 5,
         Text = 20
     };
 };

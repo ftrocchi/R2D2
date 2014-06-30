@@ -66,6 +66,10 @@ void LogicDisplay::update() {
             animateMarch(TOP_FLD_RLD);
             break;
             
+        case I2C_Logic_Mode::Color_Shift:
+            animateColorShift(TOP_FLD_RLD);
+            break;
+            
         case I2C_Logic_Mode::Text:
             animateText(TOP_FLD_RLD);
             break;
@@ -90,6 +94,10 @@ void LogicDisplay::update() {
             case I2C_Logic_Mode::March:
             case I2C_Logic_Mode::March_Separate:
                 animateMarch(BOTTOM_FLD);
+                break;
+                
+            case I2C_Logic_Mode::Color_Shift:
+                animateColorShift(BOTTOM_FLD);
                 break;
                 
             case I2C_Logic_Mode::Text:
@@ -304,6 +312,24 @@ void LogicDisplay::animateMarch(byte isTopOrBottom) {
     }
     
     marchState[isTopOrBottom] = !marchState[isTopOrBottom];
+}
+
+// ----------------------------------------------------------------------------
+// COLR SHIFT
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateColorShift(byte isTopOrBottom) {
+    if (!IsTimeForStateChange(isTopOrBottom, 150, false))
+        return;
+        
+    for(byte x=0;x<96;x++) 
+        if (isRLD) 
+            leds[pgm_read_byte(&rldMap[x])].setHSV(colorShiftHue[isTopOrBottom], 255, 255);
+        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 48) || (isTopOrBottom == BOTTOM_FLD && x >= 48)))
+            leds[pgm_read_byte(&fldMap[x])].setHSV(colorShiftHue[isTopOrBottom], 255, 255);
+            
+    colorShiftHue[isTopOrBottom]++;
+            
+    FastLED.show();         
 }
 
 // ----------------------------------------------------------------------------
