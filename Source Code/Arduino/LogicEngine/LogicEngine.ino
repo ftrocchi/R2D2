@@ -20,7 +20,10 @@ void setup() {
     psi.setup(address, isRLD);
     
     Wire.onReceive(receiveEvent);
-    logicDisplay.setMode(I2C_Logic_Display_Selection::All, I2C_Logic_Mode::March_Separate);
+    
+    logicDisplay.setText(I2C_Logic_Display_Selection::FLDTop, "HELLO R2 BUILDERS!");
+    logicDisplay.setText(I2C_Logic_Display_Selection::FLDBottom, "MIDWESTR2.COM");
+    logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBoth, I2C_Logic_Mode::Text);
 }
 
 void loop() {

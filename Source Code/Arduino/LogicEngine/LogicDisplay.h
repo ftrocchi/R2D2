@@ -34,6 +34,53 @@ const byte fldMap[]PROGMEM = {
 71,70,69,68,67,66,65,64,
 56,57,58,59,60,61,62,63};
 
+// text
+const byte letters[41][6]PROGMEM = {
+{ B11110, B00101, B00101, B11110, B00000, B00000 }, // 00 - A
+{ B11111, B10101, B10101, B01010, B00000, B00000 }, // 01 - B
+{ B01110, B10001, B10001, B10001, B00000, B00000 }, // 02 - C
+{ B11111, B10001, B10001, B01110, B00000, B00000 }, // 03 - D
+{ B11111, B10101, B10001, B00000, B00000, B00000 }, // 04 - E
+{ B11111, B00101, B00001, B00000, B00000, B00000 }, // 05 - F
+{ B01110, B10001, B11001, B01010, B00000, B00000 }, // 06 - G
+{ B11111, B00100, B00100, B11111, B00000, B00000 }, // 07 - H
+{ B10001, B11111, B10001, B00000, B00000, B00000 }, // 08 - I
+{ B01000, B10001, B01111, B00001, B00000, B00000 }, // 09 - J
+{ B11111, B00100, B11011, B00000, B00000, B00000 }, // 10 - K
+{ B11111, B10000, B10000, B00000, B00000, B00000 }, // 11 - L
+{ B11111, B00010, B00100, B00010, B11111, B00000 }, // 12 - M
+{ B11111, B00110, B01100, B11111, B00000, B00000 }, // 13 - N
+{ B01110, B10001, B10001, B01110, B00000, B00000 }, // 14 - O
+{ B11111, B00101, B00101, B00010, B00000, B00000 }, // 15 - P
+{ B01110, B10001, B11001, B11110, B00000, B00000 }, // 16 - Q
+{ B11111, B00101, B00101, B11010, B00000, B00000 }, // 17 - R
+{ B10110, B10101, B01101, B00000, B00000, B00000 }, // 18 - S
+{ B00001, B11111, B00001, B00000, B00000, B00000 }, // 19 - T
+{ B01111, B10000, B10000, B01111, B00000, B00000 }, // 20 - U
+{ B01111, B11000, B01111, B00000, B00000, B00000 }, // 21 - V
+{ B11111, B01000, B00110, B01000, B11111, B00000 }, // 22 - W
+{ B10001, B11011, B00100, B11011, B10001, B00000 }, // 23 - X
+{ B00011, B11110, B00011, B00000, B00000, B00000 }, // 24 - Y
+{ B10001, B11101, B10111, B10001, B00000, B00000 }, // 25 - Z
+{ B01110, B10001, B01110, B00000, B00000, B00000 }, // 26 - 0
+{ B10010, B11111, B10000, B00000, B00000, B00000 }, // 27 - 1
+{ B10010, B11001, B10110, B00000, B00000, B00000 }, // 28 - 2
+{ B10001, B10101, B01010, B00000, B00000, B00000 }, // 29 - 3
+{ B01100, B01010, B11111, B01000, B00000, B00000 }, // 30 - 4
+{ B10111, B10101, B01001, B00000, B00000, B00000 }, // 31 - 5
+{ B01110, B10101, B01001, B00000, B00000, B00000 }, // 32 - 6
+{ B10001, B01101, B00011, B00000, B00000, B00000 }, // 33 - 7
+{ B01010, B10101, B10101, B01010, B00000, B00000 }, // 34 - 8
+{ B10010, B10101, B01110, B00000, B00000, B00000 }, // 35 - 9
+{ B00100, B00100, B00000, B00000, B00000, B00000 }, // 36 - - 
+{ B100000, B100000, B00000, B00000, B00000, B00000 }, // 37 
+{ B10111, B00000, B00000, B00000, B00000, B00000 }, // 38 - !
+{ B10000, B00000, B00000, B00000, B00000, B00000 }, // 39 - .
+{ B00011, B00000, B00000, B00000, B00000, B00000 }  // 40 - +
+};
+
+
+
 class LogicDisplay {
     private:
         I2C_Device_Address::Value i2cAddress;
@@ -57,7 +104,7 @@ class LogicDisplay {
         void setInitialColors();
         void showStartupAnimation();
         void clear(byte isTopOrBottom);
-        bool IsTimeForStateChange(byte isTopOrBottom, int delay);
+        bool IsTimeForStateChange(byte isTopOrBottom, int delay, bool shouldClear);
         
         // on mode
         void animateOn(byte isTopOrBottom);
@@ -72,6 +119,14 @@ class LogicDisplay {
         void animateMarch(byte isTopOrBottom);
         bool marchState[2];
         
+        // text
+        void animateText(byte isTopOrBottom);
+        byte getLetterIndex(char letter);
+        void shiftRow(byte left, byte right);
+        String textString[2];
+        unsigned int textPosition[2];
+        int letterPosition[2];
+        
     public:
         void setup(I2C_Device_Address::Value address, bool isRLDLogic);
         
@@ -80,6 +135,7 @@ class LogicDisplay {
         
         void setBrightness(byte brightness);
         void setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic_Mode::Value mode);
+        void setText(I2C_Logic_Display_Selection::Value display, String text);
 };
 
 #endif

@@ -66,6 +66,9 @@ void LogicDisplay::update() {
             animateMarch(TOP_FLD_RLD);
             break;
             
+        case I2C_Logic_Mode::Text:
+            animateText(TOP_FLD_RLD);
+            break;
     }        
     
     // if this is FLD, then also a mode for bottom
@@ -87,6 +90,10 @@ void LogicDisplay::update() {
             case I2C_Logic_Mode::March:
             case I2C_Logic_Mode::March_Separate:
                 animateMarch(BOTTOM_FLD);
+                break;
+                
+            case I2C_Logic_Mode::Text:
+                animateText(BOTTOM_FLD);
                 break;
         }
     }
@@ -184,6 +191,27 @@ void LogicDisplay::setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic
         
     if (currentMode[BOTTOM_FLD] == I2C_Logic_Mode::March_Separate)
         marchState[BOTTOM_FLD] = false;
+        
+    // special handling for text
+    if (currentMode[TOP_FLD_RLD] == I2C_Logic_Mode::Text)
+        clear(TOP_FLD_RLD);
+    
+    if (currentMode[BOTTOM_FLD] == I2C_Logic_Mode::Text)
+        clear(BOTTOM_FLD);
+}
+
+void LogicDisplay::setText(I2C_Logic_Display_Selection::Value display, String text) {
+    if (display == I2C_Logic_Display_Selection::FLDTop || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::RLD || display == I2C_Logic_Display_Selection::All) {
+        textString[TOP_FLD_RLD] = text + "      ";
+        textPosition[TOP_FLD_RLD] = 0;
+        letterPosition[TOP_FLD_RLD] = 0;
+    }
+        
+    if (display == I2C_Logic_Display_Selection::FLDBottom || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::All) {
+        textString[BOTTOM_FLD] = text + "      ";
+        textPosition[BOTTOM_FLD] = 0;
+        letterPosition[BOTTOM_FLD] = 0;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -260,7 +288,7 @@ void LogicDisplay::updateLed(byte ledNum, byte hueVal) {
 // MARCH
 // ----------------------------------------------------------------------------
 void LogicDisplay::animateMarch(byte isTopOrBottom) {
-    if (!IsTimeForStateChange(isTopOrBottom, 250))
+    if (!IsTimeForStateChange(isTopOrBottom, 250, true))
         return;
         
     if (marchState[isTopOrBottom])
@@ -278,7 +306,107 @@ void LogicDisplay::animateMarch(byte isTopOrBottom) {
     marchState[isTopOrBottom] = !marchState[isTopOrBottom];
 }
 
-bool LogicDisplay::IsTimeForStateChange(byte isTopOrBottom, int delay)
+// ----------------------------------------------------------------------------
+// TEXT
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateText(byte isTopOrBottom) {
+    if (!IsTimeForStateChange(isTopOrBottom, 150, false))
+        return;
+
+    // exit if we don't have a letter to display        
+    if (textString[isTopOrBottom].length() <= textPosition[isTopOrBottom])
+    {
+        textPosition[isTopOrBottom] = 0;
+        letterPosition[isTopOrBottom] = 0;
+    }
+        
+    // display the letter
+    char letterToDisplay = textString[isTopOrBottom].charAt(textPosition[isTopOrBottom]);
+    
+    byte letterIndex = getLetterIndex(letterToDisplay);
+    
+    // display the position
+    byte d = pgm_read_byte(&letters[letterIndex][letterPosition[isTopOrBottom]]);
+    
+    // increment
+    if (d == B00000)
+    {
+        // increment letter
+        textPosition[isTopOrBottom]++;
+        letterPosition[isTopOrBottom] = 0;
+    }
+    else
+        letterPosition[isTopOrBottom]++;
+        
+    // DISPLAY IT HERE
+    
+    // shift
+    if (isRLD) {
+    } else {
+        if (isTopOrBottom == TOP_FLD_RLD) {
+            shiftRow(15,8);
+            shiftRow(16,23);
+            shiftRow(31,24);
+            shiftRow(32,39);
+            shiftRow(47,40);
+        } else {
+            shiftRow(88, 95);
+            shiftRow(87, 80);
+            shiftRow(72,79);
+            shiftRow(71,64);
+            shiftRow(56, 63);
+        }
+    }
+    
+    // put new in place
+    if (isRLD) {
+    } else {
+        if (isTopOrBottom == TOP_FLD_RLD) {
+            // top
+            leds[8] = ((d >> 0) & 1) == 1 ? primaryColor : CRGB::Black;
+            leds[23] = ((d >> 1) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[24] = ((d >> 2) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[39] = ((d >> 3) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[40] = ((d >> 4) & 1) == 1 ? primaryColor : CRGB::Black;;
+        } else {
+            leds[95] = ((d >> 0) & 1) == 1 ? primaryColor : CRGB::Black;
+            leds[80] = ((d >> 1) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[79] = ((d >> 2) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[64] = ((d >> 3) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[63] = ((d >> 4) & 1) == 1 ? primaryColor : CRGB::Black;;
+        }
+    }
+    
+    FastLED.show();
+}
+
+void LogicDisplay::shiftRow(byte left, byte right) {
+    if (left < right) {
+        for (byte x=left; x<right; x++)
+            leds[x] = leds[x+1];
+    } else {
+        for (byte x=left; x>right; x--)
+            leds[x] = leds[x-1];
+    }
+}
+
+byte LogicDisplay::getLetterIndex(char letter) {
+    if (letter >= 'A' and letter <= 'Z')
+        return letter - 'A';
+        
+    if (letter >= '0' and letter <='9')
+        return letter - '0' + 26;
+        
+    if (letter == '-') return 36;
+    if (letter == ' ') return 37;
+    if (letter == '!') return 38;
+    if (letter == '.') return 39;
+    if (letter == '+') return 40;
+    
+    return 37; // space
+}
+
+bool LogicDisplay::IsTimeForStateChange(byte isTopOrBottom, int delay, bool shouldClear)
 {
     unsigned long timeNow = millis();
   
@@ -290,7 +418,8 @@ bool LogicDisplay::IsTimeForStateChange(byte isTopOrBottom, int delay)
     lastTimeCheck[isTopOrBottom] = timeNow;
 
     // clear the device
-    clear(isTopOrBottom);
+    if (shouldClear)
+        clear(isTopOrBottom);
 
     return true;
 }

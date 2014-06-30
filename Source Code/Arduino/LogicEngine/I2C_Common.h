@@ -59,7 +59,8 @@ struct I2C_Logic_Mode {
         Off = 1,
         Normal = 2,
         March = 3,
-        March_Separate = 4
+        March_Separate = 4,
+        Text = 20
     };
 };
 
