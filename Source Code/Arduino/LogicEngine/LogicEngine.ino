@@ -35,12 +35,14 @@ void setup() {
     psi.setup(address, isRLD);
     
     Wire.onReceive(receiveEvent);
-    
-//    logicDisplay.setText(I2C_Logic_Display_Selection::FLDTop, "HELLO R2 BUILDERS!");
-//    logicDisplay.setText(I2C_Logic_Display_Selection::FLDBottom, "MIDWESTR2.COM");
+
+    logicDisplay.setPrimaryColor(I2C_Logic_Display_Selection::FLDTop, CRGB::Cyan);
+    logicDisplay.setPrimaryColor(I2C_Logic_Display_Selection::FLDBottom, CRGB::DarkViolet);
+//    logicDisplay.setText(I2C_Logic_Display_Selection::FLDTop, "R2 IS COOL");
+//    logicDisplay.setText(I2C_Logic_Display_Selection::FLDBottom, "MIDWEST R2S");
 //    logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBoth, I2C_Logic_Mode::Text);
     
-        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDTop, I2C_Logic_Mode::Left_Shift);
+        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDTop, I2C_Logic_Mode::Left_Right_Shift);
         logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBottom, I2C_Logic_Mode::Left_Right_Shift);
 }
 

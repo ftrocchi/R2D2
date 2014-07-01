@@ -15,12 +15,12 @@ void LogicDisplay::setup(I2C_Device_Address::Value address, bool isRLDLogic) {
         tweenPause = 40;
         keyPause = 1200;
         keys = sizeof(rldColors) / 3;
-        primaryColor.setHSV(rldColors[1][0], rldColors[1][1], rldColors[1][2]);  // green
+        setPrimaryColor(I2C_Logic_Display_Selection::RLD);
     } else {
         tweenPause = 7;
         keyPause = 350;
         keys = sizeof(fldColors) / 3;
-        primaryColor.setHSV(fldColors[3][0], fldColors[3][1], fldColors[3][2]);  // blue
+        setPrimaryColor(I2C_Logic_Display_Selection::FLDBoth);
     }
     
     totalColors = keys * tweens;
@@ -200,6 +200,29 @@ void LogicDisplay::clear(byte isTopOrBottom) {
     FastLED.show();           
 }
 
+void LogicDisplay::setPrimaryColor(I2C_Logic_Display_Selection::Value display, byte hue, byte saturation, byte value) {
+    if (display == I2C_Logic_Display_Selection::FLDTop || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::RLD || display == I2C_Logic_Display_Selection::All)
+        primaryColor[TOP_FLD_RLD].setHSV(hue, saturation, value);
+        
+    if (display == I2C_Logic_Display_Selection::FLDBottom || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::All)
+        primaryColor[BOTTOM_FLD].setHSV(hue, saturation, value);
+}
+
+void LogicDisplay::setPrimaryColor(I2C_Logic_Display_Selection::Value display, CRGB value) {
+    if (display == I2C_Logic_Display_Selection::FLDTop || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::RLD || display == I2C_Logic_Display_Selection::All)
+        primaryColor[TOP_FLD_RLD] = value;
+        
+    if (display == I2C_Logic_Display_Selection::FLDBottom || display == I2C_Logic_Display_Selection::FLDBoth || display == I2C_Logic_Display_Selection::All)
+        primaryColor[BOTTOM_FLD] = value;
+}
+
+void LogicDisplay::setPrimaryColor(I2C_Logic_Display_Selection::Value display) {
+    if (isRLD)
+        setPrimaryColor(display, rldColors[1][0], rldColors[1][1], rldColors[1][2]);
+    else
+        setPrimaryColor(display, fldColors[3][0], fldColors[3][1], fldColors[3][2]);
+}
+
 // ----------------------------------------------------------------------------
 // COMMANDS
 // ----------------------------------------------------------------------------
@@ -254,10 +277,14 @@ void LogicDisplay::setText(I2C_Logic_Display_Selection::Value display, String te
 void LogicDisplay::animateOn(byte isTopOrBottom) {
     for(byte x=0;x<96;x++) 
         if (isRLD) 
-            leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-        else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 40) || (isTopOrBottom == BOTTOM_FLD && x >= 40)))
-            leds[pgm_read_byte(&fldMap[x])] = primaryColor;
-            
+            leds[pgm_read_byte(&rldMap[x])] = primaryColor[TOP_FLD_RLD];
+        else if (x < 80) {
+            if (isTopOrBottom == TOP_FLD_RLD && x < 40)
+                leds[pgm_read_byte(&fldMap[x])] = primaryColor[TOP_FLD_RLD];
+            else if (isTopOrBottom == BOTTOM_FLD && x >= 40)
+                leds[pgm_read_byte(&fldMap[x])] = primaryColor[BOTTOM_FLD];
+        }
+       
     FastLED.show();         
 }
 
@@ -327,10 +354,14 @@ void LogicDisplay::animateMarch(byte isTopOrBottom) {
         clear(isTopOrBottom);
     else {
         for(byte x=0;x<96;x++) 
-            if (isRLD) 
-                leds[pgm_read_byte(&rldMap[x])] = primaryColor;
-            else if (x < 80 && ((isTopOrBottom == TOP_FLD_RLD && x < 40) || (isTopOrBottom == BOTTOM_FLD && x >= 40)))
-                leds[pgm_read_byte(&fldMap[x])] = primaryColor;
+        if (isRLD) 
+            leds[pgm_read_byte(&rldMap[x])] = primaryColor[TOP_FLD_RLD];
+        else if (x < 80) {
+            if (isTopOrBottom == TOP_FLD_RLD && x < 40)
+                leds[pgm_read_byte(&fldMap[x])] = primaryColor[TOP_FLD_RLD];
+            else if (isTopOrBottom == BOTTOM_FLD && x >= 40)
+                leds[pgm_read_byte(&fldMap[x])] = primaryColor[BOTTOM_FLD];
+        }
                 
         FastLED.show();
     }
@@ -368,17 +399,17 @@ void LogicDisplay::animateLeftShift(byte isTopOrBottom) {
         if (isRLD) {
         } else {
             if (isTopOrBottom  == TOP_FLD_RLD) {
-                leds[8] = primaryColor;
-                leds[23] = primaryColor;
-                leds[24] = primaryColor;
-                leds[39] = primaryColor;
-                leds[40] = primaryColor;
+                leds[8] = primaryColor[TOP_FLD_RLD];
+                leds[23] = primaryColor[TOP_FLD_RLD];
+                leds[24] = primaryColor[TOP_FLD_RLD];
+                leds[39] = primaryColor[TOP_FLD_RLD];
+                leds[40] = primaryColor[TOP_FLD_RLD];
             } else {
-                leds[95] = primaryColor;
-                leds[80] = primaryColor;
-                leds[79] = primaryColor;
-                leds[64] = primaryColor;
-                leds[63] = primaryColor;
+                leds[95] = primaryColor[BOTTOM_FLD];
+                leds[80] = primaryColor[BOTTOM_FLD];
+                leds[79] = primaryColor[BOTTOM_FLD];
+                leds[64] = primaryColor[BOTTOM_FLD];
+                leds[63] = primaryColor[BOTTOM_FLD];
             }
         }
     } else {
@@ -404,17 +435,17 @@ void LogicDisplay::animateRightShift(byte isTopOrBottom) {
         if (isRLD) {
         } else {
             if (isTopOrBottom  == TOP_FLD_RLD) {
-                leds[15] = primaryColor;
-                leds[16] = primaryColor;
-                leds[31] = primaryColor;
-                leds[32] = primaryColor;
-                leds[47] = primaryColor;
+                leds[15] = primaryColor[TOP_FLD_RLD];
+                leds[16] = primaryColor[TOP_FLD_RLD];
+                leds[31] = primaryColor[TOP_FLD_RLD];
+                leds[32] = primaryColor[TOP_FLD_RLD];
+                leds[47] = primaryColor[TOP_FLD_RLD];
             } else {
-                leds[88] = primaryColor;
-                leds[87] = primaryColor;
-                leds[72] = primaryColor;
-                leds[71] = primaryColor;
-                leds[56] = primaryColor;
+                leds[88] = primaryColor[BOTTOM_FLD];
+                leds[87] = primaryColor[BOTTOM_FLD];
+                leds[72] = primaryColor[BOTTOM_FLD];
+                leds[71] = primaryColor[BOTTOM_FLD];
+                leds[56] = primaryColor[BOTTOM_FLD];
             }
         }
     } else {
@@ -486,17 +517,17 @@ void LogicDisplay::animateText(byte isTopOrBottom) {
     } else {
         if (isTopOrBottom == TOP_FLD_RLD) {
             // top
-            leds[8] = ((d >> 0) & 1) == 1 ? primaryColor : CRGB::Black;
-            leds[23] = ((d >> 1) & 1) == 1 ? primaryColor : CRGB::Black;;
-            leds[24] = ((d >> 2) & 1) == 1 ? primaryColor : CRGB::Black;;
-            leds[39] = ((d >> 3) & 1) == 1 ? primaryColor : CRGB::Black;;
-            leds[40] = ((d >> 4) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[8] = ((d >> 0) & 1) == 1 ? primaryColor[TOP_FLD_RLD] : CRGB::Black;
+            leds[23] = ((d >> 1) & 1) == 1 ? primaryColor[TOP_FLD_RLD] : CRGB::Black;;
+            leds[24] = ((d >> 2) & 1) == 1 ? primaryColor[TOP_FLD_RLD] : CRGB::Black;;
+            leds[39] = ((d >> 3) & 1) == 1 ? primaryColor[TOP_FLD_RLD] : CRGB::Black;;
+            leds[40] = ((d >> 4) & 1) == 1 ? primaryColor[TOP_FLD_RLD] : CRGB::Black;;
         } else {
-            leds[95] = ((d >> 0) & 1) == 1 ? primaryColor : CRGB::Black;
-            leds[80] = ((d >> 1) & 1) == 1 ? primaryColor : CRGB::Black;;
-            leds[79] = ((d >> 2) & 1) == 1 ? primaryColor : CRGB::Black;;
-            leds[64] = ((d >> 3) & 1) == 1 ? primaryColor : CRGB::Black;;
-            leds[63] = ((d >> 4) & 1) == 1 ? primaryColor : CRGB::Black;;
+            leds[95] = ((d >> 0) & 1) == 1 ? primaryColor[BOTTOM_FLD] : CRGB::Black;
+            leds[80] = ((d >> 1) & 1) == 1 ? primaryColor[BOTTOM_FLD] : CRGB::Black;;
+            leds[79] = ((d >> 2) & 1) == 1 ? primaryColor[BOTTOM_FLD] : CRGB::Black;;
+            leds[64] = ((d >> 3) & 1) == 1 ? primaryColor[BOTTOM_FLD] : CRGB::Black;;
+            leds[63] = ((d >> 4) & 1) == 1 ? primaryColor[BOTTOM_FLD] : CRGB::Black;;
         }
     }
     

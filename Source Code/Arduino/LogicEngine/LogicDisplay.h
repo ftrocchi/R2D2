@@ -94,7 +94,7 @@ class LogicDisplay {
         byte hueVal;
         
         I2C_Logic_Mode::Value currentMode[2]; // 0 = top / rld, 1 = bottom
-        CRGB primaryColor;
+        CRGB primaryColor[2];
         unsigned long lastTimeCheck[2];
         
         void generateAllColors();
@@ -151,6 +151,9 @@ class LogicDisplay {
         void setBrightness(byte brightness);
         void setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic_Mode::Value mode);
         void setText(I2C_Logic_Display_Selection::Value display, String text);
+        void setPrimaryColor(I2C_Logic_Display_Selection::Value display, byte hue, byte saturation, byte value);
+        void setPrimaryColor(I2C_Logic_Display_Selection::Value display, CRGB value);
+        void setPrimaryColor(I2C_Logic_Display_Selection::Value display);
 };
 
 #endif
