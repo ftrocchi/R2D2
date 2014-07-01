@@ -61,6 +61,9 @@ struct I2C_Logic_Mode {
         March = 3,
         March_Separate = 4,
         Color_Shift = 5,
+        Left_Shift = 6,
+        Right_Shift = 7,
+        Left_Right_Shift = 8,
         Text = 20
     };
 };

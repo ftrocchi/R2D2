@@ -70,6 +70,18 @@ void LogicDisplay::update() {
             animateColorShift(TOP_FLD_RLD);
             break;
             
+        case I2C_Logic_Mode::Left_Shift:
+            animateLeftShift(TOP_FLD_RLD);
+            break;
+            
+        case I2C_Logic_Mode::Right_Shift:
+            animateRightShift(TOP_FLD_RLD);
+            break;
+            
+        case I2C_Logic_Mode::Left_Right_Shift:
+            animateLeftRightShift(TOP_FLD_RLD);
+            break;
+            
         case I2C_Logic_Mode::Text:
             animateText(TOP_FLD_RLD);
             break;
@@ -100,6 +112,18 @@ void LogicDisplay::update() {
                 animateColorShift(BOTTOM_FLD);
                 break;
                 
+            case I2C_Logic_Mode::Left_Shift:
+                animateLeftShift(BOTTOM_FLD);
+                break;
+                
+            case I2C_Logic_Mode::Right_Shift:
+                animateRightShift(BOTTOM_FLD);
+                break;
+                
+            case I2C_Logic_Mode::Left_Right_Shift:
+                animateLeftRightShift(BOTTOM_FLD);
+                break;
+
             case I2C_Logic_Mode::Text:
                 animateText(BOTTOM_FLD);
                 break;
@@ -333,6 +357,96 @@ void LogicDisplay::animateColorShift(byte isTopOrBottom) {
 }
 
 // ----------------------------------------------------------------------------
+// LEFT SHIFT
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateLeftShift(byte isTopOrBottom) {
+    if (!IsTimeForStateChange(isTopOrBottom,  150,  false))
+        return;
+        
+    if (leftShiftPosition[isTopOrBottom] == 0) {
+        clear(isTopOrBottom);
+        if (isRLD) {
+        } else {
+            if (isTopOrBottom  == TOP_FLD_RLD) {
+                leds[8] = primaryColor;
+                leds[23] = primaryColor;
+                leds[24] = primaryColor;
+                leds[39] = primaryColor;
+                leds[40] = primaryColor;
+            } else {
+                leds[95] = primaryColor;
+                leds[80] = primaryColor;
+                leds[79] = primaryColor;
+                leds[64] = primaryColor;
+                leds[63] = primaryColor;
+            }
+        }
+    } else {
+        shiftDisplay(isTopOrBottom, true);
+    }
+    
+    leftShiftPosition[isTopOrBottom]++;
+    if (leftShiftPosition[isTopOrBottom] == 8)
+        leftShiftPosition[isTopOrBottom] = 0;
+    
+    FastLED.show();
+}
+
+// ----------------------------------------------------------------------------
+// RIGHT SHIFT
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateRightShift(byte isTopOrBottom) {
+    if (!IsTimeForStateChange(isTopOrBottom,  150,  false))
+        return;
+        
+    if (rightShiftPosition[isTopOrBottom] == 0) {
+        clear(isTopOrBottom);
+        if (isRLD) {
+        } else {
+            if (isTopOrBottom  == TOP_FLD_RLD) {
+                leds[15] = primaryColor;
+                leds[16] = primaryColor;
+                leds[31] = primaryColor;
+                leds[32] = primaryColor;
+                leds[47] = primaryColor;
+            } else {
+                leds[88] = primaryColor;
+                leds[87] = primaryColor;
+                leds[72] = primaryColor;
+                leds[71] = primaryColor;
+                leds[56] = primaryColor;
+            }
+        }
+    } else {
+        shiftDisplay(isTopOrBottom, false);
+    }
+    
+    rightShiftPosition[isTopOrBottom]++;
+    if (rightShiftPosition[isTopOrBottom] == 8)
+        rightShiftPosition[isTopOrBottom] = 0;
+    
+    FastLED.show();
+}
+
+// ----------------------------------------------------------------------------
+// LEFT RIGHT SHIFT
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateLeftRightShift(byte isTopOrBottom) {
+    if (isMovingLeft[isTopOrBottom])
+    {
+        byte preCheck = leftShiftPosition[isTopOrBottom];
+        animateLeftShift(isTopOrBottom);
+        if (leftShiftPosition[isTopOrBottom] == 0 && leftShiftPosition[isTopOrBottom] != preCheck)
+            isMovingLeft[isTopOrBottom] = !isMovingLeft[isTopOrBottom];
+    } else {
+        byte preCheck = rightShiftPosition[isTopOrBottom];
+        animateRightShift(isTopOrBottom);
+        if (rightShiftPosition[isTopOrBottom] == 0 && rightShiftPosition[isTopOrBottom] != preCheck)
+            isMovingLeft[isTopOrBottom] = !isMovingLeft[isTopOrBottom];
+    }
+}
+
+// ----------------------------------------------------------------------------
 // TEXT
 // ----------------------------------------------------------------------------
 void LogicDisplay::animateText(byte isTopOrBottom) {
@@ -365,24 +479,7 @@ void LogicDisplay::animateText(byte isTopOrBottom) {
         letterPosition[isTopOrBottom]++;
         
     // DISPLAY IT HERE
-    
-    // shift
-    if (isRLD) {
-    } else {
-        if (isTopOrBottom == TOP_FLD_RLD) {
-            shiftRow(15,8);
-            shiftRow(16,23);
-            shiftRow(31,24);
-            shiftRow(32,39);
-            shiftRow(47,40);
-        } else {
-            shiftRow(88, 95);
-            shiftRow(87, 80);
-            shiftRow(72,79);
-            shiftRow(71,64);
-            shiftRow(56, 63);
-        }
-    }
+    shiftDisplay(isTopOrBottom, true);
     
     // put new in place
     if (isRLD) {
@@ -406,13 +503,79 @@ void LogicDisplay::animateText(byte isTopOrBottom) {
     FastLED.show();
 }
 
-void LogicDisplay::shiftRow(byte left, byte right) {
-    if (left < right) {
-        for (byte x=left; x<right; x++)
-            leds[x] = leds[x+1];
+void LogicDisplay::shiftDisplay(byte isTopOrBottom, bool moveLeft) {
+    if (isRLD) {
     } else {
-        for (byte x=left; x>right; x--)
-            leds[x] = leds[x-1];
+        if (isTopOrBottom == TOP_FLD_RLD) {
+            shiftRow(15,8, moveLeft);
+            shiftRow(16,23, moveLeft);
+            shiftRow(31,24, moveLeft);
+            shiftRow(32,39, moveLeft);
+            shiftRow(47,40, moveLeft);
+        } else {
+            shiftRow(88, 95, moveLeft);
+            shiftRow(87, 80, moveLeft);
+            shiftRow(72,79, moveLeft);
+            shiftRow(71,64, moveLeft);
+            shiftRow(56, 63, moveLeft);
+        }
+    }
+    
+    // now put black where it should
+    if (moveLeft) {
+        if (isRLD) {
+        } else {
+            if (isTopOrBottom == TOP_FLD_RLD) {
+                leds[8] = CRGB::Black;
+                leds[23] = CRGB::Black;
+                leds[24] = CRGB::Black;
+                leds[39] = CRGB::Black;
+                leds[40] = CRGB::Black;
+            } else {
+                leds[95] = CRGB::Black;
+                leds[80] = CRGB::Black;
+                leds[79] = CRGB::Black;
+                leds[64] = CRGB::Black;
+                leds[63] = CRGB::Black;
+            }
+        }
+    } else {
+        if (isRLD) {
+        } else {
+            if (isTopOrBottom == TOP_FLD_RLD) {
+                leds[15] = CRGB::Black;
+                leds[16] = CRGB::Black;
+                leds[31] = CRGB::Black;
+                leds[32] = CRGB::Black;
+                leds[47] = CRGB::Black;
+            } else {
+                leds[88] = CRGB::Black;
+                leds[87] = CRGB::Black;
+                leds[72] = CRGB::Black;
+                leds[71] = CRGB::Black;
+                leds[56] = CRGB::Black;
+            }
+        }
+    }
+}
+
+void LogicDisplay::shiftRow(byte left, byte right, bool moveLeft) {
+    if (moveLeft) {
+        if (left < right) {
+            for (byte x=left; x<right; x++)
+                leds[x] = leds[x+1];
+        } else {
+            for (byte x=left; x>right; x--)
+                leds[x] = leds[x-1];
+        }
+    } else {
+        if (left < right) {
+            for (byte x=right; x>left; x--)
+                leds[x] = leds[x-1];
+        } else {
+            for (byte x=right; x<left; x++)
+                leds[x] = leds[x+1];
+        }
     }
 }
 

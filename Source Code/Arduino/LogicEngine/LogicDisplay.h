@@ -79,8 +79,6 @@ const byte letters[41][6]PROGMEM = {
 { B00011, B00000, B00000, B00000, B00000, B00000 }  // 40 - +
 };
 
-
-
 class LogicDisplay {
     private:
         I2C_Device_Address::Value i2cAddress;
@@ -123,13 +121,26 @@ class LogicDisplay {
         void animateColorShift(byte isTopOrBottom);
         byte colorShiftHue[2];
         
+        // left shift
+        void animateLeftShift(byte isTopOrBottom);
+        byte leftShiftPosition[2];
+        
+        // right shift
+        void animateRightShift(byte isTopOrBottom);
+        byte rightShiftPosition[2];
+        
+        // left right shift
+        void animateLeftRightShift(byte isTopOrBottom);
+        bool isMovingLeft[2];
+        
         // text
         void animateText(byte isTopOrBottom);
         byte getLetterIndex(char letter);
-        void shiftRow(byte left, byte right);
+        void shiftRow(byte left, byte right, bool moveLeft);
         String textString[2];
         unsigned int textPosition[2];
         int letterPosition[2];
+        void shiftDisplay(byte isTopOrBottom, bool moveLeft);
         
     public:
         void setup(I2C_Device_Address::Value address, bool isRLDLogic);
