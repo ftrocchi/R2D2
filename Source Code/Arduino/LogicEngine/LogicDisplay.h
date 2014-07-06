@@ -34,6 +34,14 @@ const byte fldMap[]PROGMEM = {
 71,70,69,68,67,66,65,64,
 56,57,58,59,60,61,62,63};
 
+// RLD display map
+const byte rldRows[4][24]PROGMEM = {
+    { 0, 1, 2, 12, 3, 11, 4, 10, 5, 9, 6, 7, 48, 49, 62, 50, 61, 51, 60, 52, 59, 53, 54, 55 },
+    { 15, 14, 13, 16, 17, 18, 19, 20, 21, 22, 23, 8, 63, 64, 65, 66, 67, 68, 69, 70, 71, 58, 57, 56 },
+    { 32, 33, 34, 31, 30, 29, 28, 27, 26, 25, 24, 39, 80, 79, 78, 77, 76, 75, 74, 73, 72, 85, 86, 87 }, 
+    { 47, 46, 45, 35, 44, 36, 43, 37, 42, 38, 41, 40, 95, 94, 81, 93, 82, 92, 83, 91, 84, 90, 89, 88 },
+};
+
 // text
 const byte letters[41][6]PROGMEM = {
 { B11110, B00101, B00101, B11110, B00000, B00000 }, // 00 - A
@@ -136,7 +144,8 @@ class LogicDisplay {
         // text
         void animateText(byte isTopOrBottom);
         byte getLetterIndex(char letter);
-        void shiftRow(byte left, byte right, bool moveLeft);
+        void shiftFLDRow(byte left, byte right, bool moveLeft);
+        void shiftRLDRow(byte row, bool moveLeft);
         String textString[2];
         unsigned int textPosition[2];
         int letterPosition[2];
