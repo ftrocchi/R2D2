@@ -64,6 +64,13 @@ struct I2C_Logic_Mode {
         Left_Shift = 6,
         Right_Shift = 7,
         Left_Right_Shift = 8,
+        Down_Shift = 9,
+        Down_Shift_Separate = 10,
+        Up_Shift = 11,
+        Up_Shift_Separate = 12,
+        Up_Down_Shift = 13,
+        Up_Down_Shift_Separate = 14,
+        Random_Pixel = 19,
         Text = 20
     };
 };

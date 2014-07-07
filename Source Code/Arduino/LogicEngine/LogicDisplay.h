@@ -141,6 +141,11 @@ class LogicDisplay {
         void animateLeftRightShift(byte isTopOrBottom);
         bool isMovingLeft[2];
         
+        // randome pixel
+        void animateRandomPixel(byte isTopOrBottom);
+        byte currentPixel[2];
+        
+        
         // text
         void animateText(byte isTopOrBottom);
         byte getLetterIndex(char letter);

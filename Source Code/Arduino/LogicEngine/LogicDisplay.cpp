@@ -82,6 +82,10 @@ void LogicDisplay::update() {
             animateLeftRightShift(TOP_FLD_RLD);
             break;
             
+        case I2C_Logic_Mode::Random_Pixel:
+            animateRandomPixel(TOP_FLD_RLD);
+            break;
+            
         case I2C_Logic_Mode::Text:
             animateText(TOP_FLD_RLD);
             break;
@@ -122,6 +126,10 @@ void LogicDisplay::update() {
                 
             case I2C_Logic_Mode::Left_Right_Shift:
                 animateLeftRightShift(BOTTOM_FLD);
+                break;
+                
+            case I2C_Logic_Mode::Random_Pixel:
+                animateRandomPixel(BOTTOM_FLD);
                 break;
 
             case I2C_Logic_Mode::Text:
@@ -247,6 +255,13 @@ void LogicDisplay::setMode(I2C_Logic_Display_Selection::Value display, I2C_Logic
     if (currentMode[BOTTOM_FLD] == I2C_Logic_Mode::March_Separate)
         marchState[BOTTOM_FLD] = false;
         
+    // special handling for randome pixel
+    if (currentMode[TOP_FLD_RLD] == I2C_Logic_Mode::Random_Pixel)
+        clear(TOP_FLD_RLD);
+    
+    if (currentMode[BOTTOM_FLD] == I2C_Logic_Mode::Random_Pixel)
+        clear(BOTTOM_FLD);
+    
     // special handling for text
     if (currentMode[TOP_FLD_RLD] == I2C_Logic_Mode::Text)
         clear(TOP_FLD_RLD);
@@ -491,6 +506,23 @@ void LogicDisplay::animateLeftRightShift(byte isTopOrBottom) {
         if (rightShiftPosition[isTopOrBottom] == 0 && rightShiftPosition[isTopOrBottom] != preCheck)
             isMovingLeft[isTopOrBottom] = !isMovingLeft[isTopOrBottom];
     }
+}
+
+// ----------------------------------------------------------------------------
+// RANDOM PIXEL
+// ----------------------------------------------------------------------------
+void LogicDisplay::animateRandomPixel(byte isTopOrBottom) {
+    if (!IsTimeForStateChange(isTopOrBottom, 50, false))
+        return;    
+        
+    leds[currentPixel[isTopOrBottom]] = CRGB::Black;
+    
+    byte ledNum = random( isRLD ? 96 : 80);
+    leds[ledNum] = primaryColor[isTopOrBottom];
+    
+    currentPixel[isTopOrBottom] = ledNum;
+    
+    FastLED.show();
 }
 
 // ----------------------------------------------------------------------------
