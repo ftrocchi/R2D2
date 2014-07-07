@@ -518,6 +518,13 @@ void LogicDisplay::animateRandomPixel(byte isTopOrBottom) {
     leds[currentPixel[isTopOrBottom]] = CRGB::Black;
     
     byte ledNum = random( isRLD ? 96 : 80);
+    
+    if (!isRLD) {
+        ledNum += 8;
+        if (ledNum >= 48 and ledNum <=55)
+            ledNum += 8;
+    }
+    
     leds[ledNum] = primaryColor[isTopOrBottom];
     
     currentPixel[isTopOrBottom] = ledNum;
