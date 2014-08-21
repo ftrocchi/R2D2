@@ -45,6 +45,9 @@ void receiveEvent(int eventCode)
         case 6: setLED(255,0,255); break;
         case 7: setLED(255,255,0); break;
         case 8: setLED(0,255,255); break;
+            
+        default:
+            break;
     }
 }
 

@@ -20,4 +20,3 @@ void sendToHP(byte command)
     Wire.write(command);
     Wire.endTransmission();
 }
-
