@@ -1,34 +1,60 @@
 #include <Wire.h>
 
-#define redPin 10
-#define greenPin 11
-#define bluePin 9
+#define PIN_RED 10
+#define PIN_GREEN 11
+#define PIN_BLUE 9
+
+byte currentRed = 0;
+byte currentGreen = 0;
+byte currentBlue = 0;
+bool colorChanged = false;
 
 #define HP 25    // 25=Front FHP (BLUE), 26=Top THP (GREEN), 27=Rear RHP (RED)
 
 void setup()
 {
-    pinMode(redPin, OUTPUT);
-    pinMode(bluePin, OUTPUT);
-    pinMode(greenPin, OUTPUT);
+    pinMode(PIN_RED, OUTPUT);
+    pinMode(PIN_GREEN, OUTPUT);
+    pinMode(PIN_BLUE, OUTPUT);
     
     Wire.begin(HP);
-    setLED( (HP == 27) * 255, (HP == 26) * 255, (HP == 25) * 255);
+    setColor( (HP == 27) * 255, 	// red - Rear
+	          (HP == 26) * 255, 	// green - Top
+			  (HP == 25) * 255);	// blue - Front
+    setLEDOn();
     delay(5000);
-    setLED(0,0,0);
+	setLEDOff();
     
     Wire.onReceive(receiveEvent);
 }
 
 void loop()
 {
+	if (colorChanged)
+		setLEDOn();
 }
 
-void setLED(byte redValue, byte greenValue, byte blueValue)
+void setColor(byte redValue, byte greenValue, byte blueValue)
 {
-    digitalWrite(redPin, redValue);
-    digitalWrite(greenPin, greenValue);
-    digitalWrite(bluePin, blueValue);
+    currentRed = redValue;
+	currentGreen = greenValue;
+	currentBlue = blueValue;
+	colorChanged = true;
+}
+
+void setLEDOn()
+{
+    digitalWrite(PIN_RED, currentRed);
+    digitalWrite(PIN_GREEN, currentGreen);
+    digitalWrite(PIN_BLUE, currentBlue);
+	colorChanged = false;
+}
+
+void setLEDOff()
+{
+    digitalWrite(PIN_RED, 0);
+    digitalWrite(PIN_GREEN, 0);
+    digitalWrite(PIN_BLUE, 0);
 }
 
 void receiveEvent(int eventCode)
@@ -37,14 +63,20 @@ void receiveEvent(int eventCode)
     
     switch (cmd) 
     {
-        case 1: setLED(0,0,0); break;
-        case 2: setLED(255,255,255); break;
-        case 3: setLED(255,0,0); break;
-        case 4: setLED(0,255,0); break;
-        case 5: setLED(0,0,255); break;
-        case 6: setLED(255,0,255); break;
-        case 7: setLED(255,255,0); break;
-        case 8: setLED(0,255,255); break;
+	    // set the color
+        case 1: setColor(0,0,0); break;
+        case 2: setColor(255,255,255); break;
+        case 3: setColor(255,0,0); break;
+        case 4: setColor(0,255,0); break;
+        case 5: setColor(0,0,255); break;
+        case 6: setColor(255,0,255); break;
+        case 7: setColor(255,255,0); break;
+        case 8: setColor(0,255,255); break;
+		
+		// set the activity
+		case 20: SetLEDOff(); break;
+		case 21: SetLEDOn(); break;
+		
             
         default:
             break;
