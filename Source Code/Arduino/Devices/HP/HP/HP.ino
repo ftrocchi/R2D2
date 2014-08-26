@@ -7,7 +7,7 @@
 byte currentRed = 0;
 byte currentGreen = 0;
 byte currentBlue = 0;
-bool colorChanged = false;
+void currentMode = 20;
 
 #define HP 25    // 25=Front FHP (BLUE), 26=Top THP (GREEN), 27=Rear RHP (RED)
 
@@ -30,8 +30,18 @@ void setup()
 
 void loop()
 {
-	if (colorChanged)
-		setLEDOn();
+	switch (currentMode)
+	{
+		case 20: animateOff(); break;
+		case 21: animateOn(); break;
+		case 22: animateAlarm(); break;
+		case 23: animateLeia(); break;
+		case 24: animateDisco(); break;
+		case 25: animateFaliure(); break;
+		
+		default:
+			break;
+	}
 }
 
 void setColor(byte redValue, byte greenValue, byte blueValue)
@@ -39,7 +49,6 @@ void setColor(byte redValue, byte greenValue, byte blueValue)
     currentRed = redValue;
 	currentGreen = greenValue;
 	currentBlue = blueValue;
-	colorChanged = true;
 }
 
 void setLEDOn()
@@ -47,7 +56,6 @@ void setLEDOn()
     digitalWrite(PIN_RED, currentRed);
     digitalWrite(PIN_GREEN, currentGreen);
     digitalWrite(PIN_BLUE, currentBlue);
-	colorChanged = false;
 }
 
 void setLEDOff()
@@ -55,6 +63,32 @@ void setLEDOff()
     digitalWrite(PIN_RED, 0);
     digitalWrite(PIN_GREEN, 0);
     digitalWrite(PIN_BLUE, 0);
+}
+
+void animateOff()
+{
+    setLEDOff();
+}
+
+void animateOn()
+{
+    setLEDOn();
+}
+
+void animateAlarm()
+{
+}
+
+void animateLeia()
+{
+}
+
+void animateDisco()
+{
+}
+
+void animateFailyure()
+{
 }
 
 void receiveEvent(int eventCode)
