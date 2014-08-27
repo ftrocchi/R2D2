@@ -25,6 +25,14 @@ void loop()
     sendToHP(3);
     delay(5000);
 	
+	// leia
+	sendToHP(23);
+	delay(5000);
+	
+	// disco
+	sendToHP(24);
+	delay(5000);
+	
 	// failure
 	sentToHP(25);
 	delay(5000);

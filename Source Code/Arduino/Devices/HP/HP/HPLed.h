@@ -20,6 +20,9 @@ class HPLed {
         void SetLedOff();
         void SetLedOn();
         void AnimateAlarm();
+		void AnimateLeia();
+		void AnimateDisco();
+		void AnimateFailure();
         
         int currentModeState;
         unsigned long lastTimeCheck;

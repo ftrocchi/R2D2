@@ -49,6 +49,8 @@ void receiveEvent(int eventCode)
         case I2C_HP_Command::Off:
         case I2C_HP_Command::On:
         case I2C_HP_Command::Alarm:
+		case I2C_HP_Command::Leia:
+		case I2C_HP_Command::Disco:
 		case I2C_HP_Command::Failure:
             hpLed.SetMode(command);
             break;
