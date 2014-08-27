@@ -1,4 +1,6 @@
 #include <Wire.h>
+#include "HPLed.h"
+#include "I2C_Common.h"
 
 #define PIN_RED 10
 #define PIN_GREEN 11
@@ -11,8 +13,20 @@ void currentMode = 20;
 
 #define HP 25    // 25=Front FHP (BLUE), 26=Top THP (GREEN), 27=Rear RHP (RED)
 
+HPLed hpLed = HPLed(redPin, greenPin, bluePin);
+
 void setup()
 {
+<<<<<<< HEAD
+    Wire.begin(HP);
+    
+    hpLed.SetCurrentColor(  HP == 27 ? I2C_HP_Command::Red : HP == 26 ? I2C_HP_Command::Green : I2C_HP_Command::Blue);
+    hpLed.SetMode(I2C_HP_Command::On);
+    hpLed.Update();
+    delay(5000);
+    hpLed.SetMode(I2C_HP_Command::Off);
+    hpLed.Update();
+=======
     pinMode(PIN_RED, OUTPUT);
     pinMode(PIN_GREEN, OUTPUT);
     pinMode(PIN_BLUE, OUTPUT);
@@ -24,12 +38,16 @@ void setup()
     setLEDOn();
     delay(5000);
 	setLEDOff();
+>>>>>>> origin/master
     
     Wire.onReceive(receiveEvent);
 }
 
 void loop()
 {
+<<<<<<< HEAD
+    hpLed.Update();
+=======
 	switch (currentMode)
 	{
 		case 20: animateOff(); break;
@@ -89,14 +107,27 @@ void animateDisco()
 
 void animateFailyure()
 {
+>>>>>>> origin/master
 }
 
 void receiveEvent(int eventCode)
 {
-    byte cmd = Wire.read();
+    I2C_HP_Command::Value command = (I2C_HP_Command::Value)Wire.read();
     
-    switch (cmd) 
+    switch (command)
     {
+<<<<<<< HEAD
+        case I2C_HP_Command::Black:
+        case I2C_HP_Command::White:
+        case I2C_HP_Command::Red:
+        case I2C_HP_Command::Green:
+        case I2C_HP_Command::Blue:
+        case I2C_HP_Command::Magenta:
+        case I2C_HP_Command::Yellow:
+        case I2C_HP_Command::Cyan:
+            hpLed.SetCurrentColor(command);
+            break;
+=======
 	    // set the color
         case 1: setColor(0,0,0); break;
         case 2: setColor(255,255,255); break;
@@ -111,10 +142,16 @@ void receiveEvent(int eventCode)
 		case 20: SetLEDOff(); break;
 		case 21: SetLEDOn(); break;
 		
+>>>>>>> origin/master
             
+        case I2C_HP_Command::Off:
+        case I2C_HP_Command::On:
+        case I2C_HP_Command::Alarm:
+            hpLed.SetMode(command);
+            break;
+           
         default:
             break;
     }
 }
-
 

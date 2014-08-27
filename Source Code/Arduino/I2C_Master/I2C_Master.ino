@@ -31,7 +31,7 @@ PS2 ps2 = PS2();
 #define MOTOR_PIN 7
 SendOnlySoftwareSerial motorSerial(MOTOR_PIN);
 Sabertooth domeMotor(128, motorSerial);
-//Sabertooth footMotor(129, motorSerial);
+Sabertooth footMotor(129, motorSerial);
 
 //-------------------------------------------------------------------------------------------
 // WAVTRIGGER DECLARATIONS
@@ -74,7 +74,7 @@ void loop()
     
     //Serial.println("-----DOME");
     ProcessDomeMotor(SOURCE_PS2);
-//    ProcessFootMotor();
+    ProcessFootMotor();
 
     delay(20);
 }
@@ -200,7 +200,7 @@ void MotorSetup()
 {
     motorSerial.begin(9600);
     domeMotor.autobaud();
-//    footMotor.autobaud();
+    footMotor.autobaud();
 }
 
 void ProcessDomeMotor(int source)
@@ -241,8 +241,11 @@ void ProcessFootMotor()
 //    int driveValue = map(ps2.GetStickValue(PS2_STATE_RX), 0, 255, -127, 127);
 //    int turnValue = map(ps2.GetStickValue(PS2_STATE_RY), 0, 255, -127, 127);
     
-//    footMotor.drive(driveValue);
-//    footMotor.turn(turnValue);
+    int driveValue = map(ps2.GetStickValue(PS2_STATE_RX), 0, 255, -64, 64);
+    int turnValue = map(ps2.GetStickValue(PS2_STATE_RY), 0, 255, -64, 64);
+
+    footMotor.drive(driveValue);
+    footMotor.turn(turnValue);
 }
 
 //-------------------------------------------------------------------------------------------
