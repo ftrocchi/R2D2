@@ -121,23 +121,23 @@ void HPLed::SetMode(I2C_HP_Command::Value command)
             break;
             
         case I2C_HP_Command::Alarm:
-		case I2C_HP_Command::Disco:
+	case I2C_HP_Command::Disco:
             currentMode = command;
             currentModeState = 1;
             break;
 			
-		case I2C_HP_Command::Failure:
-			currentMode = command;
-			currentModeState = 0;
-			break;
+	case I2C_HP_Command::Failure:
+		currentMode = command;
+		currentModeState = 0;
+		break;
             
-		case I2C_HP_Command::Leia:
-			currentMode = command;
-			currentModeState = 0;
-			leiaDelay = 0;
-			break;
+	case I2C_HP_Command::Leia:
+		currentMode = command;
+		currentModeState = 0;
+		leiaDelay = 0;
+		break;
 
-			default:
+        default:
             break;
     }
 }
@@ -158,7 +158,7 @@ void HPLed::AnimateAlarm()
         return;
         
     if (currentModeState == 1)
-        SetColor(HIGH, HIGH, HIGH);
+        SetLedOn();
     else
         SetLedOff();
         
@@ -173,8 +173,8 @@ void HPLed::AnimateLeia()
 	switch (currentModeState)
 	{
 		case 0: SetColor(LOW, HIGH, HIGH); break;
-		case 0: SetColor(HIGH, HIGH, HIGH); break;
-		case 0: SetColor(LOW, LOW, HIGH); break;
+		case 1: SetColor(HIGH, HIGH, HIGH); break;
+		case 2: SetColor(LOW, LOW, HIGH); break;
 	}
 	
 	leiaDelay = random(1,10) * 10;
@@ -191,7 +191,7 @@ void HPLed::AnimateDisco()
         return;
         
     if (currentModeState == 1)
-        Set
+        SetColor(HIGH, HIGH, HIGH);
     else
         SetLedOff();
         
@@ -211,8 +211,7 @@ void HPLed::AnimateFailure()
 		case 3: SetColor(HIGH, LOW, HIGH); break;
 		case 4: SetColor(HIGH, HIGH, LOW); break;
 		case 5: SetColor(LOW, HIGH, HIGH); break;
-		case 0: SetColor(HIGH, HIGH, HIGH); break;
-		case 0: SetMode(I2C_HP_Command::Off); break;
+		case 6: SetMode(I2C_HP_Command::Off); break;
 		
 		default:
 			break;

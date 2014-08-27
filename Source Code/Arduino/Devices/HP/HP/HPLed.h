@@ -20,13 +20,14 @@ class HPLed {
         void SetLedOff();
         void SetLedOn();
         void AnimateAlarm();
-		void AnimateLeia();
-		void AnimateDisco();
-		void AnimateFailure();
+        void AnimateLeia();
+        void AnimateDisco();
+        void AnimateFailure();
         
         int currentModeState;
         unsigned long lastTimeCheck;
         bool IsTimeForStateChange(int delay);
+        int leiaDelay;
 
     public:
         HPLed(int red, int green, int blue);
