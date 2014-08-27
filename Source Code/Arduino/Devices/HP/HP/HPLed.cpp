@@ -32,6 +32,10 @@ void HPLed::Update()
         case I2C_HP_Command::Alarm:
             AnimateAlarm();
             break;
+			
+		case I2C_HP_Command::Failure:
+			AnimateFailure();
+			break;
             
         default:
             break;
@@ -112,6 +116,11 @@ void HPLed::SetMode(I2C_HP_Command::Value command)
             currentMode = command;
             currentModeState = 1;
             break;
+			
+		case I2C_HP_Command::Failure:
+			currentMode = command;
+			currentModeState = 0;
+			break;
             
         default:
             break;
@@ -139,6 +148,29 @@ void HPLed::AnimateAlarm()
         SetLedOff();
         
     currentModeState *= -1;
+}
+
+void HPLed::AnimateFailure()
+{
+	if (!IsTimeForStateChange(250))
+	    return;
+		
+	switch (currentModeState)
+	{
+		case 0: SetColor(HIGH, LOW, LOW); break;
+		case 1: SetColor(LOW, HIGH, LOW); break;
+		case 2: SetColor(LOW, LOW, HIGH); break;
+		case 3: SetColor(HIGH, LOW, HIGH); break;
+		case 4: SetColor(HIGH, HIGH, LOW); break;
+		case 5: SetColor(LOW, HIGH, HIGH); break;
+		case 0: SetColor(HIGH, HIGH, HIGH); break;
+		case 0: SetMode(I2C_HP_Command::Off); break;
+		
+		default:
+			break;
+	}
+	
+	currentModeState++;
 }
 
 bool HPLed::IsTimeForStateChange(int delay)

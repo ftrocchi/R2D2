@@ -24,7 +24,10 @@ void loop()
     // alarm in red
     sendToHP(3);
     delay(5000);
-    
+	
+	// failure
+	sentToHP(25);
+	delay(5000);
 }
 
 void sendToHP(byte command)
