@@ -94,7 +94,13 @@ struct I2C_HP_Command {
         Alarm = 22,
         Leia = 23,
         Disco = 24,
-        Failure = 25
+        Failure = 25,
+        XLeft = 40,
+        XCenter = 41,
+        XRight = 42,
+        YTop = 43,
+        YCenter = 44,
+        YBottom = 45
     };
 };
     

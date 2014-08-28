@@ -36,6 +36,25 @@ void loop()
     // failure
     sendToHP(25);
     delay(5000);
+    
+    // SERVO
+    sendToHP(40);
+    delay(500);
+    sendToHP(41);
+    delay(500);
+    sendToHP(42);
+    delay(500);
+    sendToHP(41);
+    delay(500);
+    
+    sendToHP(43);
+    delay(500);
+    sendToHP(44);
+    delay(500);
+    sendToHP(45);
+    delay(500);
+    sendToHP(44);
+    delay(500);
 }
 
 void sendToHP(byte command)

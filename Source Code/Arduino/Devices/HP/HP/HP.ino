@@ -1,22 +1,32 @@
 #include <Wire.h>
+#include <Servo.h>
 #include "HPLed.h"
+#include "HPServo.h"
 #include "I2C_Common.h"
 
 #define PIN_RED 10
 #define PIN_GREEN 11
 #define PIN_BLUE 9
+#define PIN_X_SERVO 3
+#define PIN_Y_SERVO 5
 
 #define HP 25    // 25=Front FHP (BLUE), 26=Top THP (GREEN), 27=Rear RHP (RED)
 
 HPLed hpLed = HPLed(PIN_RED, PIN_GREEN, PIN_BLUE);
+HPServo xServo = HPServo();
+HPServo yServo = HPServo();
 
 void setup()
 {
     Wire.begin(HP);
     
+    xServo.Init(PIN_X_SERVO);
+    yServo.Init(PIN_Y_SERVO);
+    
     hpLed.SetCurrentColor(  HP == 27 ? I2C_HP_Command::Red : HP == 26 ? I2C_HP_Command::Green : I2C_HP_Command::Blue);
     hpLed.SetMode(I2C_HP_Command::On);
     hpLed.Update();
+    
     delay(5000);
     hpLed.SetMode(I2C_HP_Command::Off);
     hpLed.Update();
@@ -58,7 +68,14 @@ void receiveEvent(int eventCode)
 	case I2C_HP_Command::Failure:
             hpLed.SetMode(command);
             break;
-           
+            
+        case I2C_HP_Command::XLeft:       xServo.MoveServo(POS_MIN);            break;
+        case I2C_HP_Command::XCenter:  xServo.MoveServo(POS_CENTER);    break;
+        case I2C_HP_Command::XRight:    xServo.MoveServo(POS_MAX);            break;
+        case I2C_HP_Command::YTop:      yServo.MoveServo(POS_MIN);            break;
+        case I2C_HP_Command::YCenter: yServo.MoveServo(POS_CENTER);    break;
+        case I2C_HP_Command::YBottom:   yServo.MoveServo(POS_MAX);            break;
+
         default:
             break;
     }
