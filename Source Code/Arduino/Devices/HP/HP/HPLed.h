@@ -10,13 +10,13 @@ class HPLed {
         byte greenPin;
         byte bluePin;
         
-        bool currentColorRed;
-        bool currentColorGreen;
-        bool currentColorBlue;
+        byte currentColorRed;
+        byte currentColorGreen;
+        byte currentColorBlue;
         
         I2C_HP_Command::Value currentMode;
         
-        void SetColor(bool red, bool green, bool blue);
+        void SetColor(byte red, byte green, byte blue);
         void SetLedOff();
         void SetLedOn();
         void AnimateAlarm();
@@ -34,6 +34,7 @@ class HPLed {
         void Update();
         
         void SetCurrentColor(I2C_HP_Command::Value command);
+        void SetCurrentColor(byte red, byte green, byte blue);
         
         void SetMode(I2C_HP_Command::Value command);
 };

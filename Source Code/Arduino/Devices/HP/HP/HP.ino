@@ -46,12 +46,16 @@ void receiveEvent(int eventCode)
             hpLed.SetCurrentColor(command);
             break;
             
+        case I2C_HP_Command::CustomColor:
+            hpLed.SetCurrentColor(Wire.read(), Wire.read(), Wire.read());
+            break;
+            
         case I2C_HP_Command::Off:
         case I2C_HP_Command::On:
         case I2C_HP_Command::Alarm:
-		case I2C_HP_Command::Leia:
-		case I2C_HP_Command::Disco:
-		case I2C_HP_Command::Failure:
+	case I2C_HP_Command::Leia:
+	case I2C_HP_Command::Disco:
+	case I2C_HP_Command::Failure:
             hpLed.SetMode(command);
             break;
            

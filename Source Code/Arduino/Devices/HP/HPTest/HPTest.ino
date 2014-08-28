@@ -21,8 +21,8 @@ void loop()
     sendToHP(22);
     delay(5000);
     
-    // alarm in red
-    sendToHP(3);
+    // alarm in dark purple using custom color
+    sendToHP(9, 19, 14, 24);
     delay(5000);
 	
     // leia
@@ -42,5 +42,15 @@ void sendToHP(byte command)
 {
     Wire.beginTransmission(25);
     Wire.write(command);
+    Wire.endTransmission();
+}
+
+void sendToHP(byte command, byte red, byte green, byte blue)
+{
+    Wire.beginTransmission(25);
+    Wire.write(command);
+    Wire.write(red);
+    Wire.write(green);
+    Wire.write(blue);
     Wire.endTransmission();
 }

@@ -88,6 +88,7 @@ struct I2C_HP_Command {
         Magenta = 6,
         Yellow = 7,
         Cyan = 8,
+        CustomColor = 9,
         Off = 20,
         On = 21,
         Alarm = 22,

@@ -10,9 +10,9 @@ HPLed::HPLed(int red, int green, int blue)
     pinMode(greenPin, OUTPUT);
     pinMode(bluePin, OUTPUT);
     
-    currentColorRed = LOW;
-    currentColorGreen = LOW;
-    currentColorBlue = LOW;
+    currentColorRed = 0;
+    currentColorGreen = 0;
+    currentColorBlue = 0;
     
     currentMode = I2C_HP_Command::Off;
 }
@@ -33,28 +33,35 @@ void HPLed::Update()
             AnimateAlarm();
             break;
 			
-		case I2C_HP_Command::Leia:
-			AnimateLeia();
-			break;
+	case I2C_HP_Command::Leia:
+		AnimateLeia();
+		break;
 			
-		case I2C_HP_Command::Disco:
-			AnimateDisco();
-			break;
+	case I2C_HP_Command::Disco:
+		AnimateDisco();
+		break;
 			
-		case I2C_HP_Command::Failure:
-			AnimateFailure();
-			break;
+	case I2C_HP_Command::Failure:
+		AnimateFailure();
+		break;
             
         default:
             break;
     }
 }
 
-void HPLed::SetColor(bool red, bool green, bool blue)
+void HPLed::SetColor(byte red, byte green, byte blue)
 {
-    digitalWrite(redPin, red);
-    digitalWrite(greenPin, green);
-    digitalWrite(bluePin, blue);
+    analogWrite(redPin, red);
+    analogWrite(greenPin, green);
+    analogWrite(bluePin, blue);
+}
+
+void HPLed::SetCurrentColor(byte red, byte green, byte blue)
+{
+    currentColorRed = red;
+    currentColorGreen = green;
+    currentColorBlue = blue;
 }
 
 void HPLed::SetCurrentColor(I2C_HP_Command::Value command)
@@ -62,51 +69,51 @@ void HPLed::SetCurrentColor(I2C_HP_Command::Value command)
     switch (command)
     {
         case I2C_HP_Command::Black:
-            currentColorRed = false;
-            currentColorGreen = false;
-            currentColorBlue = false;
+            currentColorRed = 0;
+            currentColorGreen = 0;
+            currentColorBlue = 0;
             break;
             
         case I2C_HP_Command::White:
-            currentColorRed = true;
-            currentColorGreen = true;
-            currentColorBlue = true;
+            currentColorRed = 255;
+            currentColorGreen = 255;
+            currentColorBlue = 255;
             break;
             
         case I2C_HP_Command::Red:
-            currentColorRed = true;
-            currentColorGreen = false;
-            currentColorBlue = false;
+            currentColorRed = 255;
+            currentColorGreen = 0;
+            currentColorBlue = 0;
             break;
             
         case I2C_HP_Command::Green:
-            currentColorRed = false;
-            currentColorGreen = true;
-            currentColorBlue = false;
+            currentColorRed = 0;
+            currentColorGreen = 255;
+            currentColorBlue = 0;
             break;
             
         case I2C_HP_Command::Blue:
-            currentColorRed = false;
-            currentColorGreen = false;
-            currentColorBlue = true;
+            currentColorRed = 0;
+            currentColorGreen = 0;
+            currentColorBlue = 255;
             break;
             
         case I2C_HP_Command::Magenta:
-            currentColorRed = true;
-            currentColorGreen = false;
-            currentColorBlue = true;
+            currentColorRed = 255;
+            currentColorGreen = 0;
+            currentColorBlue = 255;
             break;
             
         case I2C_HP_Command::Yellow:
-            currentColorRed = true;
-            currentColorGreen = true;
-            currentColorBlue = false;
+            currentColorRed = 255;
+            currentColorGreen = 255;
+            currentColorBlue = 0;
             break;
             
         case I2C_HP_Command::Cyan:
-            currentColorRed = false;
-            currentColorGreen = true;
-            currentColorBlue = true;
+            currentColorRed = 0;
+            currentColorGreen = 255;
+            currentColorBlue = 255;
             break;
     }
 }
@@ -172,9 +179,9 @@ void HPLed::AnimateLeia()
 		
 	switch (currentModeState)
 	{
-		case 0: SetColor(LOW, HIGH, HIGH); break;
-		case 1: SetColor(HIGH, HIGH, HIGH); break;
-		case 2: SetColor(LOW, LOW, HIGH); break;
+		case 0: SetColor(0, 255, 255); break;
+		case 1: SetColor(255, 255, 255); break;
+		case 2: SetColor(0, 0, 255); break;
 	}
 	
 	leiaDelay = random(1,10) * 10;
@@ -191,7 +198,7 @@ void HPLed::AnimateDisco()
         return;
         
     if (currentModeState == 1)
-        SetColor(HIGH, HIGH, HIGH);
+        SetColor(255, 255, 255);
     else
         SetLedOff();
         
@@ -205,12 +212,12 @@ void HPLed::AnimateFailure()
 		
 	switch (currentModeState)
 	{
-		case 0: SetColor(HIGH, LOW, LOW); break;
-		case 1: SetColor(LOW, HIGH, LOW); break;
-		case 2: SetColor(LOW, LOW, HIGH); break;
-		case 3: SetColor(HIGH, LOW, HIGH); break;
-		case 4: SetColor(HIGH, HIGH, LOW); break;
-		case 5: SetColor(LOW, HIGH, HIGH); break;
+		case 0: SetColor(255, 0, 0); break;
+		case 1: SetColor(0, 255, 0); break;
+		case 2: SetColor(0, 0, 255); break;
+		case 3: SetColor(255, 0, 255); break;
+		case 4: SetColor(255, 255, 0); break;
+		case 5: SetColor(0, 255, 255); break;
 		case 6: SetMode(I2C_HP_Command::Off); break;
 		
 		default:
