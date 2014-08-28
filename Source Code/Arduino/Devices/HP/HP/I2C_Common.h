@@ -100,7 +100,20 @@ struct I2C_HP_Command {
         XRight = 42,
         YTop = 43,
         YCenter = 44,
-        YBottom = 45
+        YBottom = 45,
+        XCustom = 46,
+        YCustom = 47,
+        TopLeft = 50,
+        TopCenter = 51,
+        TopRight = 52,
+        CenterLeft = 53,
+        CenterCenter = 54,
+        CenterRight = 55,
+        BottomLeft = 56,
+        BottomCenter = 57,
+        BottomRight = 58,
+        Both = 59
+        
     };
 };
     

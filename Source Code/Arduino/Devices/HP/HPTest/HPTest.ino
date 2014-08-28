@@ -38,6 +38,8 @@ void loop()
     delay(5000);
     
     // SERVO
+    sendToHP(3);
+    sendToHP(21);
     sendToHP(40);
     delay(500);
     sendToHP(41);
@@ -47,6 +49,8 @@ void loop()
     sendToHP(41);
     delay(500);
     
+    sendToHP(4);
+    sendToHP(21);
     sendToHP(43);
     delay(500);
     sendToHP(44);
@@ -55,6 +59,14 @@ void loop()
     delay(500);
     sendToHP(44);
     delay(500);
+    
+    sendToHP(5);
+    sendToHP(21);
+    for (int i=50; i<59; i++)
+    {
+        sendToHP(i);
+        delay(500);
+    }
 }
 
 void sendToHP(byte command)

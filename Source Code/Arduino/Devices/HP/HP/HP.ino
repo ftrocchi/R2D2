@@ -75,6 +75,17 @@ void receiveEvent(int eventCode)
         case I2C_HP_Command::YTop:      yServo.MoveServo(POS_MIN);            break;
         case I2C_HP_Command::YCenter: yServo.MoveServo(POS_CENTER);    break;
         case I2C_HP_Command::YBottom:   yServo.MoveServo(POS_MAX);            break;
+        
+        
+        case I2C_HP_Command::TopLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_MIN); break;
+        case I2C_HP_Command::TopCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_MIN); break;
+        case I2C_HP_Command::TopRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_MIN); break;
+        case I2C_HP_Command::CenterLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_CENTER); break;
+        case I2C_HP_Command::CenterCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_CENTER); break;
+        case I2C_HP_Command::CenterRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_CENTER); break;
+        case I2C_HP_Command::BottomLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_MAX); break;
+        case I2C_HP_Command::BottomCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_MAX); break;
+        case I2C_HP_Command::BottomRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_MAX); break;
 
         default:
             break;
