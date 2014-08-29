@@ -14,11 +14,13 @@ class HPServo
     private:
         Servo servo;
         int servoPin;
+
+        void Twitch(bool isLarge);        
         
     public:
         void Init(int pin);
         void MoveServo(int pos);
-		void Update();
+	void Update();
 };
 
 #endif

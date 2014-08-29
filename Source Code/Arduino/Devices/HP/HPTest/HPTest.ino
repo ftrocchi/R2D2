@@ -19,19 +19,19 @@ void loop()
     // alarm in blue
     sendToHP(5);
     sendToHP(22);
-    delay(5000);
+    delay(2000);
     
     // alarm in dark purple using custom color
     sendToHP(9, 19, 14, 24);
-    delay(5000);
+    delay(2000);
 	
     // leia
     sendToHP(23);
-    delay(5000);
+    delay(2000);
 	
     // disco
     sendToHP(24);
-    delay(5000);
+    delay(2000);
 	
     // failure
     sendToHP(25);
@@ -67,6 +67,19 @@ void loop()
         sendToHP(i);
         delay(500);
     }
+    
+    for (int i=20;i<160;i++)
+    {
+        sendToHP(46, i);
+        sendToHP(47, 160-i);
+        delay(15);
+    }
+    
+    for (int i=20;i<160;i++)
+    {
+        sendToHP(59,i,160-i);
+        delay(15);
+    }
 }
 
 void sendToHP(byte command)
@@ -83,5 +96,22 @@ void sendToHP(byte command, byte red, byte green, byte blue)
     Wire.write(red);
     Wire.write(green);
     Wire.write(blue);
+    Wire.endTransmission();
+}
+
+void sendToHP(byte command, byte value)
+{
+    Wire.beginTransmission(25);
+    Wire.write(command);
+    Wire.write(value);
+    Wire.endTransmission();
+}
+
+void sendToHP(byte command, byte x, byte y)
+{
+    Wire.beginTransmission(25);
+    Wire.write(command);
+    Wire.write(x);
+    Wire.write(y);
     Wire.endTransmission();
 }

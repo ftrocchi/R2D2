@@ -20,3 +20,7 @@ void HPServo::MoveServo(int pos)
     
     servo.write(pos);
 }
+
+void HPServo::Twitch(bool isLarge)
+{
+}
