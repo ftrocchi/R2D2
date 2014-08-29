@@ -9,6 +9,10 @@ void HPServo::Init(int pin)
     MoveServo(POS_CENTER);
 }
 
+void HPServo::Update()
+{
+}
+
 void HPServo::MoveServo(int pos)
 {
     if (pos < POS_MIN) pos = POS_MIN;

@@ -113,11 +113,8 @@ struct I2C_HP_Command {
         BottomCenter = 57,
         BottomRight = 58,
         Both = 59
-        
     };
 };
     
-
-
 #endif
 

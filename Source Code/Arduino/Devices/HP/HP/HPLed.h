@@ -35,9 +35,7 @@ class HPLed {
         
         void SetCurrentColor(I2C_HP_Command::Value command);
         void SetCurrentColor(byte red, byte green, byte blue);
-        
         void SetMode(I2C_HP_Command::Value command);
 };
-
 
 #endif

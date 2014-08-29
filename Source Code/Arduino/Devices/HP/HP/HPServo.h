@@ -17,9 +17,8 @@ class HPServo
         
     public:
         void Init(int pin);
-        
         void MoveServo(int pos);
+		void Update();
 };
-
 
 #endif

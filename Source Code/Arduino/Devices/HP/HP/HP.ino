@@ -37,6 +37,8 @@ void setup()
 void loop()
 {
     hpLed.Update();
+	xServo.Update();
+	yServo.Update();
 }
 
 void receiveEvent(int eventCode)
@@ -63,19 +65,20 @@ void receiveEvent(int eventCode)
         case I2C_HP_Command::Off:
         case I2C_HP_Command::On:
         case I2C_HP_Command::Alarm:
-	case I2C_HP_Command::Leia:
-	case I2C_HP_Command::Disco:
-	case I2C_HP_Command::Failure:
+        case I2C_HP_Command::Leia:
+        case I2C_HP_Command::Disco:
+        case I2C_HP_Command::Failure:
             hpLed.SetMode(command);
             break;
             
-        case I2C_HP_Command::XLeft:       xServo.MoveServo(POS_MIN);            break;
-        case I2C_HP_Command::XCenter:  xServo.MoveServo(POS_CENTER);    break;
-        case I2C_HP_Command::XRight:    xServo.MoveServo(POS_MAX);            break;
-        case I2C_HP_Command::YTop:      yServo.MoveServo(POS_MIN);            break;
-        case I2C_HP_Command::YCenter: yServo.MoveServo(POS_CENTER);    break;
-        case I2C_HP_Command::YBottom:   yServo.MoveServo(POS_MAX);            break;
-        
+        case I2C_HP_Command::XLeft: xServo.MoveServo(POS_MIN); break;
+        case I2C_HP_Command::XCenter: xServo.MoveServo(POS_CENTER); break;
+        case I2C_HP_Command::XRight: xServo.MoveServo(POS_MAX); break;
+        case I2C_HP_Command::YTop: yServo.MoveServo(POS_MIN); break;
+        case I2C_HP_Command::YCenter: yServo.MoveServo(POS_CENTER); break;
+        case I2C_HP_Command::YBottom: yServo.MoveServo(POS_MAX); break;
+		case I2C_HP_Command::XCustom: xServo.MoveServo(Wire.read()); break;
+		case I2C_HP_Command::YCustom: yServo.MoveServo(Wire.read()); break;
         
         case I2C_HP_Command::TopLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_MIN); break;
         case I2C_HP_Command::TopCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_MIN); break;
@@ -86,9 +89,9 @@ void receiveEvent(int eventCode)
         case I2C_HP_Command::BottomLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_MAX); break;
         case I2C_HP_Command::BottomCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_MAX); break;
         case I2C_HP_Command::BottomRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_MAX); break;
+		case I2C_HP_Command::Both: xServo.MoveServo(Wire.read()); yServo.MoveServo(Wire.read()); break;
 
         default:
             break;
     }
 }
-
