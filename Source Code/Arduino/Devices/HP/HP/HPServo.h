@@ -14,13 +14,20 @@ class HPServo
     private:
         Servo servo;
         int servoPin;
+        bool twitch;
+        byte twitchFrequency;
+        unsigned long lastTimeCheck;
 
-        void Twitch(bool isLarge);        
+        void Twitch(bool isLarge);     
+        void MoveServo(int pos);
+        
         
     public:
         void Init(int pin);
-        void MoveServo(int pos);
+        void MoveServoManual(int pos);
 	void Update();
+        void SetTwitch(bool isOn);
+        void SetTwitchFrequency(byte frequency);
 };
 
 #endif

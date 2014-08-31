@@ -44,6 +44,7 @@ void loop()
 void receiveEvent(int eventCode)
 {
     I2C_HP_Command::Value command = (I2C_HP_Command::Value)Wire.read();
+    byte frequency;
     
     switch (command)
     {
@@ -71,25 +72,41 @@ void receiveEvent(int eventCode)
             hpLed.SetMode(command);
             break;
             
-        case I2C_HP_Command::XLeft: xServo.MoveServo(POS_MIN); break;
-        case I2C_HP_Command::XCenter: xServo.MoveServo(POS_CENTER); break;
-        case I2C_HP_Command::XRight: xServo.MoveServo(POS_MAX); break;
-        case I2C_HP_Command::YTop: yServo.MoveServo(POS_MIN); break;
-        case I2C_HP_Command::YCenter: yServo.MoveServo(POS_CENTER); break;
-        case I2C_HP_Command::YBottom: yServo.MoveServo(POS_MAX); break;
-		case I2C_HP_Command::XCustom: xServo.MoveServo(Wire.read()); break;
-		case I2C_HP_Command::YCustom: yServo.MoveServo(Wire.read()); break;
+        case I2C_HP_Command::XLeft: xServo.MoveServoManual(POS_MIN); break;
+        case I2C_HP_Command::XCenter: xServo.MoveServoManual(POS_CENTER); break;
+        case I2C_HP_Command::XRight: xServo.MoveServoManual(POS_MAX); break;
+        case I2C_HP_Command::YTop: yServo.MoveServoManual(POS_MIN); break;
+        case I2C_HP_Command::YCenter: yServo.MoveServoManual(POS_CENTER); break;
+        case I2C_HP_Command::YBottom: yServo.MoveServoManual(POS_MAX); break;
+	case I2C_HP_Command::XCustom: xServo.MoveServoManual(Wire.read()); break;
+	case I2C_HP_Command::YCustom: yServo.MoveServoManual(Wire.read()); break;
         
-        case I2C_HP_Command::TopLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_MIN); break;
-        case I2C_HP_Command::TopCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_MIN); break;
-        case I2C_HP_Command::TopRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_MIN); break;
-        case I2C_HP_Command::CenterLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_CENTER); break;
-        case I2C_HP_Command::CenterCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_CENTER); break;
-        case I2C_HP_Command::CenterRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_CENTER); break;
-        case I2C_HP_Command::BottomLeft: xServo.MoveServo(POS_MIN); yServo.MoveServo(POS_MAX); break;
-        case I2C_HP_Command::BottomCenter: xServo.MoveServo(POS_CENTER); yServo.MoveServo(POS_MAX); break;
-        case I2C_HP_Command::BottomRight: xServo.MoveServo(POS_MAX); yServo.MoveServo(POS_MAX); break;
-		case I2C_HP_Command::Both: xServo.MoveServo(Wire.read()); yServo.MoveServo(Wire.read()); break;
+        case I2C_HP_Command::TopLeft: xServo.MoveServoManual(POS_MIN); yServo.MoveServoManual(POS_MIN); break;
+        case I2C_HP_Command::TopCenter: xServo.MoveServoManual(POS_CENTER); yServo.MoveServoManual(POS_MIN); break;
+        case I2C_HP_Command::TopRight: xServo.MoveServoManual(POS_MAX); yServo.MoveServoManual(POS_MIN); break;
+        case I2C_HP_Command::CenterLeft: xServo.MoveServoManual(POS_MIN); yServo.MoveServoManual(POS_CENTER); break;
+        case I2C_HP_Command::CenterCenter: xServo.MoveServoManual(POS_CENTER); yServo.MoveServoManual(POS_CENTER); break;
+        case I2C_HP_Command::CenterRight: xServo.MoveServoManual(POS_MAX); yServo.MoveServoManual(POS_CENTER); break;
+        case I2C_HP_Command::BottomLeft: xServo.MoveServoManual(POS_MIN); yServo.MoveServoManual(POS_MAX); break;
+        case I2C_HP_Command::BottomCenter: xServo.MoveServoManual(POS_CENTER); yServo.MoveServoManual(POS_MAX); break;
+        case I2C_HP_Command::BottomRight: xServo.MoveServoManual(POS_MAX); yServo.MoveServoManual(POS_MAX); break;
+	case I2C_HP_Command::Both: xServo.MoveServoManual(Wire.read()); yServo.MoveServoManual(Wire.read()); break;
+
+        case I2C_HP_Command::TwitchOff:
+            xServo.SetTwitch(false);
+            yServo.SetTwitch(false);
+            break;
+            
+        case I2C_HP_Command::TwitchOn:
+            xServo.SetTwitch(true);
+            yServo.SetTwitch(true);
+            break;
+            
+        case I2C_HP_Command::TwitchFrequency:
+            frequency = Wire.read();
+            xServo.SetTwitchFrequency(frequency);
+            yServo.SetTwitchFrequency(frequency);
+            break;
 
         default:
             break;

@@ -80,6 +80,16 @@ void loop()
         sendToHP(59,i,160-i);
         delay(15);
     }
+
+    // test twitch
+    sendToHP(62, 5);
+    sendToHP(21);
+    sendToHP(4);
+    sendToHP(61);
+    delay(32000);
+    sendToHP(3);
+    sendToHP(60);
+    delay(30000);
 }
 
 void sendToHP(byte command)

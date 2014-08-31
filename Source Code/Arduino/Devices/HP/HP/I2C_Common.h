@@ -112,7 +112,10 @@ struct I2C_HP_Command {
         BottomLeft = 56,
         BottomCenter = 57,
         BottomRight = 58,
-        Both = 59
+        Both = 59,
+        TwitchOff = 60,
+        TwitchOn = 61,
+        TwitchFrequency = 62
     };
 };
     
