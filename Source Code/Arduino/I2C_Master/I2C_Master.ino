@@ -42,14 +42,20 @@ WAVTrigger wavTrigger(&wavSerial);
 bool enteringWAVCode;
 byte wavCode;
 byte masterVolume;
+#define WAV_STARTUP 138
+#define WAV_NOTOUCH 139
+#define WAV_RANDOM_BEGIN 13
+#define WAV_RANDOM_END 53
+#define WAV_RANDOM_MILLISECONDS 20000
+bool isWavRandomOn;
+unsigned long wavLastTimeCheck;
 
 //-------------------------------------------------------------------------------------------
 // SETUP AND LOOP
 //-------------------------------------------------------------------------------------------
 void setup()
 {
-    //Serial.begin(9600);
-    //Serial.println("BEGIN");
+    randomSeed(analogRead(0));
     WebSocketSetup();
     ps2.Init(9600, 8, 9);
     MotorSetup();
@@ -57,7 +63,7 @@ void setup()
     I2CSetup();
     
     // play the startup sound so we know we're ready to go
-    wavTrigger.TrackPlaySolo(52);
+    wavTrigger.TrackPlaySolo(WAV_STARTUP);
     delay(2000);
 }
 
@@ -256,13 +262,32 @@ void WavTriggerSetup()
     wavSerial.begin(57600);
     delay(2000);
     wavTrigger.AmpPower(false);
-    masterVolume = 100;
+    masterVolume = 150;
     wavTrigger.SetMasterVolume(masterVolume);
     enteringWAVCode = false;
 }
 
 void ProcessWavTrigger()
 {
+    // play a random sound if we should
+    if (isWavRandomOn)
+    {
+        // check if it is time to play
+        unsigned long timeNow = millis();
+        
+        if (timeNow - wavLastTimeCheck > WAV_RANDOM_MILLISECONDS)
+        {
+            // time to play
+            wavLastTimeCheck= timeNow;
+            
+            // generate a random number
+            int trackToPlay = random(40) + 13;
+            
+            // play it
+            wavTrigger.TrackPlaySolo(trackToPlay);
+        }
+    }
+    
     if (ps2.IsButtonJustPressed(PS2_STATE_R1))
     {
         //Serial.println("LISTENING FOR CODE");
@@ -328,6 +353,17 @@ void ProcessWavTrigger()
     {
         masterVolume-=5;
         AdjustMasterVolume(masterVolume, true);
+    }
+    
+    if (ps2.IsButtonJustPressed(PS2_STATE_START))
+    {
+        wavTrigger.TrackPlaySolo(WAV_NOTOUCH);
+    }
+    
+    if (ps2.IsButtonJustPressed(PS2_STATE_R2))
+    {
+        isWavRandomOn = !isWavRandomOn;
+        wavLastTimeCheck = millis() - WAV_RANDOM_MILLISECONDS;
     }
 }
 
