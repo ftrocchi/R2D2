@@ -63,22 +63,17 @@ void setup()
     I2CSetup();
     
     // play the startup sound so we know we're ready to go
-    wavTrigger.TrackPlaySolo(WAV_STARTUP);
-    delay(2000);
+    wavCode = WAV_STARTUP;
 }
 
 void loop()
 {
-    //Serial.println("LOOP");
     webSocket.listen();
     
-    //Serial.println("-----PS2");
     ProcessPS2();
     
-   // Serial.println("-----WAV");
     ProcessWavTrigger();
     
-    //Serial.println("-----DOME");
     ProcessDomeMotor(SOURCE_PS2);
     ProcessFootMotor();
 
@@ -125,15 +120,6 @@ void OnData(WebSocket &socket, char* dataString, byte frameLength)
         command[index] = atoi(token);
         index++;
     }
-    
-    Serial.print("I2C MESSAGE:");
-    Serial.print(command[0]);
-    for (int i=1; i < index; i++)
-    {
-        Serial.print("-");
-        Serial.print(command[i]);
-    }
-    Serial.println("");
     
     // if it is less than 128 it is an i2c command so send it over i2c
     if (command[0] < 128)
@@ -290,7 +276,6 @@ void ProcessWavTrigger()
     
     if (ps2.IsButtonJustPressed(PS2_STATE_R1))
     {
-        //Serial.println("LISTENING FOR CODE");
         enteringWAVCode = true;
         wavCode = 0;
     }
@@ -322,9 +307,7 @@ void ProcessWavTrigger()
     
     if (ps2.IsButtonJustReleased(PS2_STATE_R1))
     {
-        //Serial.println("TIME TO PLAY SOUND");
         enteringWAVCode = false;
-        //Serial.println(wavCode);
         
         if (wavCode == 0)
             wavTrigger.StopAllTracks();
@@ -332,17 +315,6 @@ void ProcessWavTrigger()
         // play it here!
         wavTrigger.TrackPlaySolo(wavCode);
     }
-    
-    // VOLUME
-    //Serial.print("SOUND BUTTONS: (");
-    //Serial.print(masterVolume);
-    //Serial.print(") - UP:");
-    //Serial.print(ps2.IsButtonPressed(PS2_STATE_PAD_UP));
-    //Serial.print(" - DOWN:");
-    //Serial.println(ps2.IsButtonPressed(PS2_STATE_PAD_DOWN));
-    
-    
-    
     
     if (ps2.IsButtonPressed(PS2_STATE_PAD_UP) && masterVolume < 250)
     {
@@ -378,7 +350,3 @@ void AdjustMasterVolume(byte newVolume, bool updateTablet)
     
     wavTrigger.SetMasterVolume(masterVolume);
 }
-
-
-
-
