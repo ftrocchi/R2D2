@@ -14,6 +14,15 @@
 #define HP 1 // 1=Front(BLUE), 2=TOP(Red), 3=Rear(Green);
 #define STARTUPDELAY 3000
 
+I2C_HP_Mode::Value currentMode = I2C_HP_Mode::Color;
+I2C_SystemEvent::Value currentSystemEvent = I2C_SystemEvent::Off;
+unsigned long systemEventStartTime;
+unsigned long systemEventEndTime;
+unsigned long systemEventCurrentTime;
+unsigned long systemEventPhaseEndTime;
+unsigned long systemEventPhase;
+
+
 void setLed(I2C_HP_Color::Value color, int timeInMilliseconds = 0) {
     digitalWrite(REDPIN, color & bit(0));
     digitalWrite(GREENPIN, color & bit(1));
@@ -52,16 +61,97 @@ void setup() {
 }
 
 void loop() {
+    processSystemEvent();
+    
 }
 
+// Adding braces after case statements to fix 'jumping the case label'error - ugh
+
 void receiveEvent(int eventCode) {
-    I2C_HP_Mode::Value mode = (I2C_HP_Mode::Value)Wire.read();
+    currentMode = (I2C_HP_Mode::Value)Wire.read();
     
-    switch (mode) {
+    switch (currentMode) {
         case I2C_HP_Mode::Color:
-            I2C_HP_Color::Value color = (I2C_HP_Color::Value)Wire.read();
-            setLed(color);
+            {
+                I2C_HP_Color::Value color = (I2C_HP_Color::Value)Wire.read();
+                setLed(color);
+            }
             break;
+            
+        case I2C_HP_Mode::SystemEvent:
+            {
+                currentSystemEvent = (I2C_SystemEvent::Value)Wire.read();
+                systemEventStartTime = millis();
+                
+                switch (currentSystemEvent) {
+                    case I2C_SystemEvent::Off:
+                        // TODO implement this
+                        break;
+                    
+                    case I2C_SystemEvent::LeiaMessage:
+                        // the top and rear HPs need to turn off
+                        if (HP == 2 || HP == 3)
+                            setLed(I2C_HP_Color::Off);
+                            
+                        // TODO - if it is front HP, lower the hp
+                        
+                        // set the end time
+                        // TODO get accurate time for leia message
+                        systemEventEndTime = systemEventStartTime + 30000; 
+                        systemEventPhase = 0;
+                        systemEventPhaseEndTime = 0;
+                        break;
+                }
+            }
+            break;
+    }
+}
+
+void processSystemEvent() {
+    if (currentMode == I2C_HP_Mode::SystemEvent) {
+        switch (currentSystemEvent) {
+            case I2C_SystemEvent::Off:
+                setLed(I2C_HP_Color::Off);
+                break;
+                
+            case I2C_SystemEvent::LeiaMessage:
+                updateLeiaMessage();
+                break;
+        }
+    }
+}
+
+void updateLeiaMessage() {
+    // get the current time
+    systemEventCurrentTime = millis();
+    
+    // if time has expired, turn off and exit
+    if (systemEventCurrentTime > systemEventEndTime) {
+        currentSystemEvent = I2C_SystemEvent::Off;
+        return;
+    }
+    
+    // if delay time has expired, change the color randomly
+    if (systemEventPhaseEndTime < systemEventCurrentTime) {
+        switch (systemEventPhase) {
+            case 0:
+                setLed(I2C_HP_Color::Cyan);
+                systemEventPhaseEndTime = systemEventCurrentTime + random(1, 10) * 10;
+                systemEventPhase = 1;
+                break;
+                
+            case 1:
+                setLed(I2C_HP_Color::White);
+                systemEventPhaseEndTime = systemEventCurrentTime + random(1, 5) * 10;
+                systemEventPhase = 2;
+                break;
+
+            case 2:
+                setLed(I2C_HP_Color::Blue);
+                systemEventPhaseEndTime = systemEventCurrentTime + random(4, 9) * 10;
+                systemEventPhase = 0;
+                break;
+        }
     }
 }
 

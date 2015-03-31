@@ -25,7 +25,14 @@ struct I2C_HP_Color {
 struct I2C_HP_Mode {
     enum Value {
         Color = 0,
-        Event = 99,
+        SystemEvent = 99,
+    };
+};
+
+struct I2C_SystemEvent {
+    enum Value {
+        Off = 0,
+        LeiaMessage = 1,
     };
 };
 
