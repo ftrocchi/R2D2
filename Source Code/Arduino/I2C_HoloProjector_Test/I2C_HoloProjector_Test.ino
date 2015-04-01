@@ -59,6 +59,23 @@ void loop() {
     Wire.endTransmission();
     
     delayPrint(3);
+    
+    // do partial imperial march - color to magenta
+    debugPrint("Partial Imperial March - color to magenta");
+    debugPrint("Sending to %d mode %d sytem event: %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::SystemEvent, I2C_SystemEvent::ImperialMarch);
+    Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
+    Wire.write(I2C_HP_Mode::SystemEvent);
+    Wire.write(I2C_SystemEvent::ImperialMarch);
+    Wire.endTransmission();
+    delayPrint(10);
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, I2C_HP_Color::Magenta);
+    Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Magenta);
+    Wire.endTransmission();
+
+    delayPrint(3);
+    
 }
 
 void delayPrint(int max) {
