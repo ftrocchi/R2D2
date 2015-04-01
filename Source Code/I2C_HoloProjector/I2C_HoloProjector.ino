@@ -90,6 +90,10 @@ void receiveEvent(int eventCode) {
                     case I2C_SystemEvent::LeiaMessage:
                         setupLeiaMessage();
                         break;
+                        
+                    case I2C_SystemEvent::ImperialMarch:
+                        setupImperialMarch();
+                        break;
                 }
             }
             break;
@@ -105,6 +109,10 @@ void processSystemEvent() {
                 
             case I2C_SystemEvent::LeiaMessage:
                 updateLeiaMessage();
+                break;
+                
+            case I2C_SystemEvent::ImperialMarch:
+                updateImperialMarch();
                 break;
         }
     }
@@ -164,6 +172,42 @@ void updateLeiaMessage() {
 //------------------------------------------------------------------------------
 // IMPERIAL MARCH
 //------------------------------------------------------------------------------
+void setupImperialMarch() {
+    // set the end time
+    // TODO get accurate time for imperial march
+    systemEventEndTime = systemEventStartTime + 30000; 
+    systemEventPhase = 0;
+    systemEventPhaseEndTime = 0;
+}
 
+void updateImperialMarch() {
+    // get the current time
+    systemEventCurrentTime = millis();
+    
+    // if time has expired, turn off and exit
+    if (systemEventCurrentTime > systemEventEndTime) {
+        currentSystemEvent = I2C_SystemEvent::Off;
+        return;
+    }
+    
+    // TODO determine beat time 
+    int beatInMilliseconds = 500;
 
+    // if delay time has expired, change the color randomly
+    if (systemEventPhaseEndTime < systemEventCurrentTime) {
+        switch (systemEventPhase) {
+            case 0:
+                setLed(I2C_HP_Color::Red);
+                systemEventPhaseEndTime = systemEventCurrentTime + beatInMilliseconds;
+                systemEventPhase = 1;
+                break;
+                
+            case 1:
+                setLed(I2C_HP_Color::Off);
+                systemEventPhaseEndTime = systemEventCurrentTime + beatInMilliseconds;
+                systemEventPhase = 0;
+                break;
+        }
+    }
+}
 

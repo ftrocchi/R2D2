@@ -33,6 +33,7 @@ struct I2C_SystemEvent {
     enum Value {
         Off = 0,
         LeiaMessage = 1,
+        ImperialMarch = 2,
     };
 };
 
