@@ -11,7 +11,10 @@
 #define GREENPIN 11
 #define BLUEPIN 9
 
-#define HP 1 // 1=Front(BLUE), 2=TOP(Red), 3=Rear(Green);
+// 1=Front(BLUE), 2=TOP(Red), 3=Rear(Green);
+#define HP 1 
+
+// Amount of time to show the color designation for the HP
 #define STARTUPDELAY 3000
 
 I2C_HP_Mode::Value currentMode = I2C_HP_Mode::Color;
@@ -21,7 +24,6 @@ unsigned long systemEventEndTime;
 unsigned long systemEventCurrentTime;
 unsigned long systemEventPhaseEndTime;
 unsigned long systemEventPhase;
-
 
 void setLed(I2C_HP_Color::Value color, int timeInMilliseconds = 0) {
     digitalWrite(REDPIN, color & bit(0));
@@ -33,7 +35,6 @@ void setLed(I2C_HP_Color::Value color, int timeInMilliseconds = 0) {
         setLed(I2C_HP_Color::Off);
     }
 }
-
 
 void setup() {
     pinMode(REDPIN, OUTPUT);
@@ -62,11 +63,9 @@ void setup() {
 
 void loop() {
     processSystemEvent();
-    
 }
 
 // Adding braces after case statements to fix 'jumping the case label'error - ugh
-
 void receiveEvent(int eventCode) {
     currentMode = (I2C_HP_Mode::Value)Wire.read();
     
@@ -89,17 +88,7 @@ void receiveEvent(int eventCode) {
                         break;
                     
                     case I2C_SystemEvent::LeiaMessage:
-                        // the top and rear HPs need to turn off
-                        if (HP == 2 || HP == 3)
-                            setLed(I2C_HP_Color::Off);
-                            
-                        // TODO - if it is front HP, lower the hp
-                        
-                        // set the end time
-                        // TODO get accurate time for leia message
-                        systemEventEndTime = systemEventStartTime + 30000; 
-                        systemEventPhase = 0;
-                        systemEventPhaseEndTime = 0;
+                        setupLeiaMessage();
                         break;
                 }
             }
@@ -119,6 +108,23 @@ void processSystemEvent() {
                 break;
         }
     }
+}
+
+//------------------------------------------------------------------------------
+// LEIA MESSAGE
+//------------------------------------------------------------------------------
+void setupLeiaMessage() {
+    // the top and rear HPs need to turn off
+    if (HP == 2 || HP == 3)
+        setLed(I2C_HP_Color::Off);
+        
+    // TODO - if it is front HP, lower the hp
+    
+    // set the end time
+    // TODO get accurate time for leia message
+    systemEventEndTime = systemEventStartTime + 30000; 
+    systemEventPhase = 0;
+    systemEventPhaseEndTime = 0;
 }
 
 void updateLeiaMessage() {
@@ -154,5 +160,10 @@ void updateLeiaMessage() {
         }
     }
 }
+
+//------------------------------------------------------------------------------
+// IMPERIAL MARCH
+//------------------------------------------------------------------------------
+
 
 
