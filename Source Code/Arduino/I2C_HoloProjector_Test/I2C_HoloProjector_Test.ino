@@ -26,7 +26,7 @@ void loop() {
     Wire.write(I2C_HP_Mode::SystemEvent);
     Wire.write(I2C_SystemEvent::LeiaMessage);
     Wire.endTransmission();
-    delayPrint(32);
+    delayPrint(38);
     
     // do partial leia message - system event off
     debugPrint("Partial Leia Message - system event off");
@@ -44,18 +44,18 @@ void loop() {
     
     delayPrint(3);
     
-    // do partial leia message - color to red
-    debugPrint("Partial Leia Message - color to red");
+    // do partial leia message - color to yellow
+    debugPrint("Partial Leia Message - color to yellow");
     debugPrint("Sending to %d mode %d sytem event: %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::SystemEvent, I2C_SystemEvent::LeiaMessage);
     Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
     Wire.write(I2C_HP_Mode::SystemEvent);
     Wire.write(I2C_SystemEvent::LeiaMessage);
     Wire.endTransmission();
     delayPrint(10);
-    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, I2C_HP_Color::Red);
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, I2C_HP_Color::Yellow);
     Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
     Wire.write(I2C_HP_Mode::Color);
-    Wire.write(I2C_HP_Color::Red);
+    Wire.write(I2C_HP_Color::Yellow);
     Wire.endTransmission();
     
     delayPrint(3);
@@ -67,14 +67,52 @@ void loop() {
     Wire.write(I2C_HP_Mode::SystemEvent);
     Wire.write(I2C_SystemEvent::ImperialMarch);
     Wire.endTransmission();
+    debugPrint("Sending to %d mode %d sytem event: %d", I2C_DeviceAddress::TopHP, I2C_HP_Mode::SystemEvent, I2C_SystemEvent::ImperialMarch);
+    Wire.beginTransmission(I2C_DeviceAddress::TopHP);
+    Wire.write(I2C_HP_Mode::SystemEvent);
+    Wire.write(I2C_SystemEvent::ImperialMarch);
+    Wire.endTransmission();
+    debugPrint("Sending to %d mode %d sytem event: %d", I2C_DeviceAddress::RearHP, I2C_HP_Mode::SystemEvent, I2C_SystemEvent::ImperialMarch);
+    Wire.beginTransmission(I2C_DeviceAddress::RearHP);
+    Wire.write(I2C_HP_Mode::SystemEvent);
+    Wire.write(I2C_SystemEvent::ImperialMarch);
+    Wire.endTransmission();
     delayPrint(10);
     debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, I2C_HP_Color::Magenta);
     Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
     Wire.write(I2C_HP_Mode::Color);
     Wire.write(I2C_HP_Color::Magenta);
     Wire.endTransmission();
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::TopHP, I2C_HP_Mode::Color, I2C_HP_Color::Magenta);
+    Wire.beginTransmission(I2C_DeviceAddress::TopHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Magenta);
+    Wire.endTransmission();
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::RearHP, I2C_HP_Mode::Color, I2C_HP_Color::Magenta);
+    Wire.beginTransmission(I2C_DeviceAddress::RearHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Magenta);
+    Wire.endTransmission();
 
     delayPrint(3);
+
+    // turn all off    
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, I2C_HP_Color::Off);
+    Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Off);
+    Wire.endTransmission();
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::TopHP, I2C_HP_Mode::Color, I2C_HP_Color::Off);
+    Wire.beginTransmission(I2C_DeviceAddress::TopHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Off);
+    Wire.endTransmission();
+    debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::RearHP, I2C_HP_Mode::Color, I2C_HP_Color::Off);
+    Wire.beginTransmission(I2C_DeviceAddress::RearHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Off);
+    Wire.endTransmission();
+    
     
 }
 

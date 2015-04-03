@@ -12,7 +12,7 @@
 #define BLUEPIN 9
 
 // 1=Front(BLUE), 2=TOP(Red), 3=Rear(Green);
-#define HP 1 
+#define HP 1
 
 // Amount of time to show the color designation for the HP
 #define STARTUPDELAY 3000
@@ -129,8 +129,7 @@ void setupLeiaMessage() {
     // TODO - if it is front HP, lower the hp
     
     // set the end time
-    // TODO get accurate time for leia message
-    systemEventEndTime = systemEventStartTime + 30000; 
+    systemEventEndTime = systemEventStartTime + 35000;
     systemEventPhase = 0;
     systemEventPhaseEndTime = 0;
 }
@@ -175,7 +174,7 @@ void updateLeiaMessage() {
 void setupImperialMarch() {
     // set the end time
     // TODO get accurate time for imperial march
-    systemEventEndTime = systemEventStartTime + 30000; 
+    systemEventEndTime = systemEventStartTime + 185000; 
     systemEventPhase = 0;
     systemEventPhaseEndTime = 0;
 }
