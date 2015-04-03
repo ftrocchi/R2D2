@@ -173,7 +173,6 @@ void updateLeiaMessage() {
 //------------------------------------------------------------------------------
 void setupImperialMarch() {
     // set the end time
-    // TODO get accurate time for imperial march
     systemEventEndTime = systemEventStartTime + 185000; 
     systemEventPhase = 0;
     systemEventPhaseEndTime = 0;
@@ -189,8 +188,7 @@ void updateImperialMarch() {
         return;
     }
     
-    // TODO determine beat time 
-    int beatInMilliseconds = 500;
+    int beatInMilliseconds = 577;
 
     // if delay time has expired, change the color randomly
     if (systemEventPhaseEndTime < systemEventCurrentTime) {

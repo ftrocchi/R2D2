@@ -77,7 +77,7 @@ void loop() {
     Wire.write(I2C_HP_Mode::SystemEvent);
     Wire.write(I2C_SystemEvent::ImperialMarch);
     Wire.endTransmission();
-    delayPrint(10);
+    delayPrint(60);
     debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, I2C_HP_Color::Magenta);
     Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
     Wire.write(I2C_HP_Mode::Color);
