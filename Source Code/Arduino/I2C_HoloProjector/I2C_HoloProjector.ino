@@ -6,7 +6,6 @@
 
 #include "I2C_Common.h"
 #include <Wire.h>
-#include <Servo.h>
 
 #define REDPIN 10
 #define GREENPIN 11
@@ -25,8 +24,6 @@ unsigned long systemEventEndTime;
 unsigned long systemEventCurrentTime;
 unsigned long systemEventPhaseEndTime;
 unsigned long systemEventPhase;
-
-Servo servos[2];
 
 void setLed(I2C_HP_Color::Value color, int timeInMilliseconds = 0) {
   digitalWrite(REDPIN, color & bit(0));
@@ -60,9 +57,6 @@ void setup() {
       setLed(I2C_HP_Color::Green, STARTUPDELAY);
       break;
   }
-
-  servos[0].attach(3);
-  servos[1].attach(5);
 
   Wire.onReceive(receiveEvent);
 }
@@ -162,30 +156,6 @@ void updateImperialMarch() {
 }
 
 //------------------------------------------------------------------------------
-// SERVOS
-//------------------------------------------------------------------------------
-byte clampServoPosition(byte position) {
-  return position > 180 ? 180 : position;
-}
-
-void setServoLocation(I2C_HP_Servo::Value servo, byte position) {
-  position = clampServoPosition(position);
-  servos[(byte)servo].write(position);
-}
-
-void setTargettedPosition(I2C_HP_ServoMode::Value servoMode) {
-    // targeted positions are only TopLeft to BottomRight
-    if (servoMode < I2C_HP_ServoMode::TopLeft || servoMode > I2C_HP_ServoMode::BottomRight)
-        return;
-
-    byte x = ((byte)servoMode % 3) * 90;
-    byte y = ((byte)servoMode / 3) * 90;    
-        
-    setServoLocation(I2C_HP_Servo::XServo, x);
-    setServoLocation(I2C_HP_Servo::YServo, y);
-}
-
-//------------------------------------------------------------------------------
 // I2C
 //------------------------------------------------------------------------------
 // Adding braces after case statements to fix 'jumping the case label'error - ugh
@@ -200,13 +170,6 @@ void receiveEvent(int eventCode) {
       }
       break;
       
-    case I2C_HP_Mode::Servo:
-        {
-            I2C_HP_ServoMode::Value servoMode = (I2C_HP_ServoMode::Value)Wire.read();
-            setTargettedPosition(servoMode);
-        }
-        break;
-
     case I2C_HP_Mode::SystemEvent:
         {
             currentSystemEvent = (I2C_SystemEvent::Value)Wire.read();

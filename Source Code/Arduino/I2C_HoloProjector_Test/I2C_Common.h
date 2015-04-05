@@ -39,39 +39,8 @@ struct I2C_HP_Color {
 struct I2C_HP_Mode {
     enum Value {
         Color = 0,
-        Servo = 1,
         SystemEvent = 99,
     };
 };
-
-struct I2C_HP_Servo {
-    enum Value {
-        XServo = 0,
-        YServo = 1,
-    };
-};
-
-struct I2C_HP_ServoMode {
-  enum Value {
-      // no value
-      TopLeft = 0,
-      Top = 1,
-      TopRight = 2,
-      Left = 3,
-      Center = 4,
-      Right = 5,
-      BottomLeft = 6,
-      Bottom = 7, 
-      BottomRight = 8,
-      TwitchOff = 9,
-      TwicthOn = 10,
-      // single value
-      HorizontalOnly = 100,
-      VerticalOnly = 101,
-      // doubel value
-      HorizontalAndVertical = 200,
-  };  
-};
-
 
 #endif
