@@ -39,6 +39,7 @@ struct I2C_HP_Color {
 struct I2C_HP_Mode {
     enum Value {
         Color = 0,
+        TwitchColor = 1,
         SystemEvent = 99,
     };
 };
