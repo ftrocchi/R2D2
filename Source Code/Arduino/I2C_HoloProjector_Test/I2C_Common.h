@@ -17,6 +17,7 @@ struct I2C_SystemEvent {
         Off = 0,
         LeiaMessage = 1,
         ImperialMarch = 2,
+        TwitchHPColor =3,
     };
 };
 
@@ -39,7 +40,6 @@ struct I2C_HP_Color {
 struct I2C_HP_Mode {
     enum Value {
         Color = 0,
-        TwitchColor = 1,
         SystemEvent = 99,
     };
 };

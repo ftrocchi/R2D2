@@ -154,6 +154,34 @@ void updateImperialMarch() {
 }
 
 //------------------------------------------------------------------------------
+// TWITCH COLOR
+//------------------------------------------------------------------------------
+void setupTwitchHPColor() {
+    systemEventEndTime = systemEventStartTime + 3600000;
+    systemEventPhase = 0;
+    systemEventPhaseEndTime = 0;
+}
+
+void updateTwitchHPColor() {
+        // get the current time
+    systemEventCurrentTime = millis();
+
+    // if time has expired, turn off and exit
+    if (systemEventCurrentTime > systemEventEndTime) {
+        currentSystemEvent = I2C_SystemEvent::Off;
+        return;
+    }
+    
+    // if delay time has expired, change the color randomly
+    if (systemEventPhaseEndTime < systemEventCurrentTime) {
+        int colorNumber = random((int)I2C_HP_Color::Off,((int)I2C_HP_Color::White)+1);
+        setLed((I2C_HP_Color::Value)colorNumber);
+        systemEventPhaseEndTime = systemEventCurrentTime + random(4, 9) * 1000;
+    }
+}
+
+
+//------------------------------------------------------------------------------
 // I2C
 //------------------------------------------------------------------------------
 // Adding braces after case statements to fix 'jumping the case label'error - ugh
@@ -167,7 +195,7 @@ void receiveEvent(int eventCode) {
             setLed(color);
         }
         break;
-      
+        
         case I2C_HP_Mode::SystemEvent:
         {
             currentSystemEvent = (I2C_SystemEvent::Value)Wire.read();
@@ -183,6 +211,10 @@ void receiveEvent(int eventCode) {
     
                 case I2C_SystemEvent::ImperialMarch:
                     setupImperialMarch();
+                    break;
+                    
+                case I2C_SystemEvent::TwitchHPColor:
+                    setupTwitchHPColor();
                     break;
             }
         }
@@ -203,6 +235,10 @@ void processSystemEvent() {
 
             case I2C_SystemEvent::ImperialMarch:
                 updateImperialMarch();
+                break;
+                
+            case I2C_SystemEvent::TwitchHPColor:
+                updateTwitchHPColor();
                 break;
         }
     }

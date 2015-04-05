@@ -18,6 +18,22 @@ void loop() {
         Wire.endTransmission();
         delayPrint(1);
     }
+    
+    debugPrint("Sending color twitch");
+    Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
+    Wire.write(I2C_HP_Mode::SystemEvent);
+    Wire.write(I2C_SystemEvent::TwitchHPColor);
+    Wire.endTransmission();
+    delayPrint(30);
+
+    Wire.beginTransmission(I2C_DeviceAddress::FrontHP);
+    Wire.write(I2C_HP_Mode::Color);
+    Wire.write(I2C_HP_Color::Off);
+    Wire.endTransmission();
+    
+    delayPrint(3);
+
+    /*
     // do full leia message
     debugPrint("Full Leia Message");
     debugPrint("Sending to %d mode %d sytem event: %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::SystemEvent, I2C_SystemEvent::LeiaMessage);
@@ -111,6 +127,7 @@ void loop() {
     Wire.write(I2C_HP_Mode::Color);
     Wire.write(I2C_HP_Color::Off);
     Wire.endTransmission();
+    */
 }
 
 void delayPrint(int max) {
