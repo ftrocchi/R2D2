@@ -9,6 +9,50 @@ void setup() {
 }
 
 void loop() {
+    // TEST MAGIC PANEL
+    debugPrint("MagicPanel On");
+    Wire.beginTransmission(I2C_DeviceAddress::MagicPanel);
+    Wire.write(I2C_MagicPanel_Command::On);
+    Wire.endTransmission();
+    
+    delayPrint(3);
+    
+    debugPrint("MagicPanel Off");
+    Wire.beginTransmission(I2C_DeviceAddress::MagicPanel);
+    Wire.write(I2C_MagicPanel_Command::Off);
+    Wire.endTransmission();
+    
+    delayPrint(3);
+    
+    debugPrint("MagicPanel Brightness");
+    Wire.beginTransmission(I2C_DeviceAddress::MagicPanel);
+    Wire.write(I2C_MagicPanel_Command::On);
+    Wire.endTransmission();
+    for (int i=0; i<16; i++) {
+        Wire.beginTransmission(I2C_DeviceAddress::MagicPanel);
+        Wire.write(I2C_MagicPanel_Command::Brightness);
+        Wire.write(i);
+        Wire.endTransmission();
+        delay(200);
+    }
+    
+    Wire.beginTransmission(I2C_DeviceAddress::MagicPanel);
+    Wire.write(I2C_MagicPanel_Command::Off);
+    Wire.endTransmission();
+    delayPrint(3);
+    
+    debugPrint("modes");
+    for (int i=0; i<15; i++) {
+        Wire.beginTransmission(I2C_DeviceAddress::MagicPanel);
+        Wire.write(I2C_MagicPanel_Command::Mode);
+        Wire.write(i);
+        Wire.endTransmission();
+        delayPrint(5);
+    }
+    
+    
+    /*
+    delayPrint(3);
     debugPrint("Testing all 8 colors");
     for (int i=0; i<7; i++) {
         debugPrint("Sending to %d mode %d color %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::Color, (I2C_HP_Color::Value)i);
@@ -33,7 +77,6 @@ void loop() {
     
     delayPrint(3);
 
-    /*
     // do full leia message
     debugPrint("Full Leia Message");
     debugPrint("Sending to %d mode %d sytem event: %d", I2C_DeviceAddress::FrontHP, I2C_HP_Mode::SystemEvent, I2C_SystemEvent::LeiaMessage);
