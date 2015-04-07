@@ -14,9 +14,14 @@ void setup() {
     setupServoBoard();
     
     Wire.begin(servoBoardAddress);
+    Wire.onReceive(receiveEvent);
 }
 
 void loop() {
+    setServoPosition(0, 0);
+    delay(2000);
+    setServoPosition(0, 180);
+    delay(2000);
 }
 
 int clamp(int value, int min, int max) {
@@ -29,9 +34,24 @@ int clamp(int value, int min, int max) {
 }
 
 void setServoPosition(int servo, int value) {
-    if (servo > maxServosIndex)
+    if (servo > SERVOCOUNT - 1)
         return;
     
     servos[servo].write(clamp(value, servoMins[servo], servoMaxs[servo]));
+}
+
+//------------------------------------------------------------------------------
+// I2C
+//------------------------------------------------------------------------------
+void receiveEvent(int eventCode) {
+    I2C_ServoBoard_Command::Value servoBoardCommand = (I2C_ServoBoard_Command::Value)Wire.read();
+    
+    switch (servoBoardCommand) {
+        case I2C_ServoBoard_Command::MoveTo:
+            int servoIndex = Wire.read();
+            int angle = Wire.read();
+            setServoPosition(servoIndex, angle);
+            break;
+    };
 }
 
