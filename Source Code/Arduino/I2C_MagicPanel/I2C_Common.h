@@ -10,6 +10,9 @@ struct I2C_DeviceAddress {
         FrontHP = 25,
         TopHP = 26,
         RearHP = 27,
+        DomePanelServo = 64,
+        DomeHPServo = 65,
+        BodyServo = 66,
     };
 };
 
