@@ -18,10 +18,14 @@ void setup() {
 }
 
 void loop() {
-    setServoPosition(0, 0);
+    int i=0;
+    
+    for (i=0; i<11; i++) {
+    setServoPosition(i, 0);
     delay(2000);
-    setServoPosition(0, 180);
+    setServoPosition(i, 180);
     delay(2000);
+    }
 }
 
 int clamp(int value, int min, int max) {

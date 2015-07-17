@@ -45,7 +45,7 @@ void setup() {
 //        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDTop, I2C_Logic_Mode::Left_Right_Shift);
 //        logicDisplay.setMode(I2C_Logic_Display_Selection::FLDBottom, I2C_Logic_Mode::Left_Right_Shift);
 
-        logicDisplay.setMode(I2C_Logic_Display_Selection::All, I2C_Logic_Mode::Random_Pixel);
+//        logicDisplay.setMode(I2C_Logic_Display_Selection::All, I2C_Logic_Mode::Random_Pixel);
 
 }
 
