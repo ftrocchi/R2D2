@@ -6,22 +6,9 @@
 //------------------------------------------------------------------------------
 struct I2C_DeviceAddress {
     enum Value {
-        MagicPanel = 20,
         FrontHP = 25,
         TopHP = 26,
         RearHP = 27,
-        DomePanelServo = 64,
-        DomeHPServo = 65,
-        BodyServo = 66,
-    };
-};
-
-struct I2C_SystemEvent {
-    enum Value {
-        Off = 0,
-        LeiaMessage = 1,
-        ImperialMarch = 2,
-        TwitchHPColor =3,
     };
 };
 
@@ -44,57 +31,25 @@ struct I2C_HP_Color {
 struct I2C_HP_Mode {
     enum Value {
         Color = 0,
-        SystemEvent = 99,
+        Servo = 1,
     };
 };
 
-//------------------------------------------------------------------------------
-// MAGIC PANEL
-//------------------------------------------------------------------------------
-struct I2C_MagicPanel_Command
-{
-    enum Value 
-    {
-        On = 0,
-        Off = 1,
-        Brightness = 2,
-        Mode = 3,
-        Random = 4
-    };
-};
-
-struct I2C_MagicPanel_Mode
-{
-    enum Value
-    {
-        Alert = 0,
-        ToggleTopBottom = 1,
-        ToggleLeftRight = 2,
-        ToggleQuad = 3,
-        QuadCycleCounterClockwise = 4,
-        QuadCycleClockwise = 5,
-        TraceUp = 6,
-        TraceDown = 7,
-        TraceUpDown = 8,
-        TraceLeft = 9,
-        TraceRight = 10,
-        TraceLeftRight = 11,
-        SingleLEDTest = 12,
-        DoubleLEDTest = 13,
-        RandomPixel = 14,
-        String = 15
-    };
-};
-
-//------------------------------------------------------------------------------
-// SERVO BOARDS
-//------------------------------------------------------------------------------
-struct I2C_ServoBoard_Command {
+struct I2C_HP_Servo {
     enum Value {
-        MoveTo = 0,
+        TopLeft = 0,
+        Top = 1,
+        TopRight = 2,
+        Left = 3,
+        Center = 4,
+        Right = 5,
+        BottomLeft = 6,
+        Bottom = 7,
+        BottomRight = 8,
+        MoveTo = 9,
+        TwitchOn = 10,
+        TwitchOff = 11,
     };
 };
-
-
 
 #endif

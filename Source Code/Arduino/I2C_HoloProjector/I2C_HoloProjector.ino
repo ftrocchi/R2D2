@@ -6,24 +6,27 @@
 
 #include "I2C_Common.h"
 #include <Wire.h>
+#include <Servo.h>
 
 #define REDPIN 10
 #define GREENPIN 11
 #define BLUEPIN 9
 
 // 1=Front(BLUE), 2=TOP(Red), 3=Rear(Green);
-#define HP 1
+#define HP 3
 
 // Amount of time to show the color designation for the HP
 #define STARTUPDELAY 3000
 
-I2C_HP_Mode::Value currentMode = I2C_HP_Mode::Color;
-I2C_SystemEvent::Value currentSystemEvent = I2C_SystemEvent::Off;
-unsigned long systemEventStartTime;
-unsigned long systemEventEndTime;
-unsigned long systemEventCurrentTime;
-unsigned long systemEventPhaseEndTime;
-unsigned long systemEventPhase;
+// servo mins and max
+#define SERVOMIN 20
+#define SERVOMAX 150
+
+Servo hp1Servo;
+Servo hp2Servo;
+bool isTwitchOn = true;
+unsigned long currentTime;
+unsigned long endTime;
 
 void setLed(I2C_HP_Color::Value color, int timeInMilliseconds = 0) {
     digitalWrite(REDPIN, color & bit(0));
@@ -36,157 +39,70 @@ void setLed(I2C_HP_Color::Value color, int timeInMilliseconds = 0) {
     }
 }
 
+void setServo1(int value) {
+    hp1Servo.write(clamp(value, SERVOMIN, SERVOMAX));
+}
+
+void setServo2(int value) {
+    hp2Servo.write(clamp(value, SERVOMIN, SERVOMAX));
+}
+
 void setup() {
+    randomSeed(analogRead(0));
+    
     pinMode(REDPIN, OUTPUT);
     pinMode(GREENPIN, OUTPUT);
     pinMode(BLUEPIN, OUTPUT);
 
+    hp1Servo.attach(3);
+    hp2Servo.attach(5);
+
     switch (HP) {
         case 1:
-        Wire.begin(I2C_DeviceAddress::FrontHP);
-        setLed(I2C_HP_Color::Blue, STARTUPDELAY);
-        break;
+            Wire.begin(I2C_DeviceAddress::FrontHP);
+            setLed(I2C_HP_Color::Blue, STARTUPDELAY);
+            break;
 
         case 2:
             Wire.begin(I2C_DeviceAddress::TopHP);
             setLed(I2C_HP_Color::Red, STARTUPDELAY);
             break;
 
-            case 3:
+        case 3:
             Wire.begin(I2C_DeviceAddress::RearHP);
             setLed(I2C_HP_Color::Green, STARTUPDELAY);
             break;
     }
 
-      Wire.onReceive(receiveEvent);
+    Wire.onReceive(receiveEvent);
 }
 
 void loop() {
-    processSystemEvent();
+    processTwitch();
 }
 
-//------------------------------------------------------------------------------
-// LEIA MESSAGE
-//------------------------------------------------------------------------------
-void setupLeiaMessage() {
-    // the top and rear HPs need to turn off
-    if (HP == 2 || HP == 3)
-        setLed(I2C_HP_Color::Off);
-
-    // set the end time
-    systemEventEndTime = systemEventStartTime + 35000;
-    systemEventPhase = 0;
-    systemEventPhaseEndTime = 0;
-}
-
-void updateLeiaMessage() {
-    // get the current time
-    systemEventCurrentTime = millis();
-
-    // if time has expired, turn off and exit
-    if (systemEventCurrentTime > systemEventEndTime) {
-        currentSystemEvent = I2C_SystemEvent::Off;
-        return;
-    }
-
-    // if delay time has expired, change the color randomly
-    if (systemEventPhaseEndTime < systemEventCurrentTime) {
-        switch (systemEventPhase) {
-        case 0:
-            setLed(I2C_HP_Color::Cyan);
-            systemEventPhaseEndTime = systemEventCurrentTime + random(1, 10) * 10;
-            systemEventPhase = 1;
-            break;
-
-        case 1:
-            setLed(I2C_HP_Color::White);
-            systemEventPhaseEndTime = systemEventCurrentTime + random(1, 5) * 10;
-            systemEventPhase = 2;
-            break;
-
-        case 2:
-            setLed(I2C_HP_Color::Blue);
-            systemEventPhaseEndTime = systemEventCurrentTime + random(4, 9) * 10;
-            systemEventPhase = 0;
-            break;
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-// IMPERIAL MARCH
-//------------------------------------------------------------------------------
-void setupImperialMarch() {
-    // set the end time
-    systemEventEndTime = systemEventStartTime + 185000;
-    systemEventPhase = 0;
-    systemEventPhaseEndTime = 0;
-}
-
-void updateImperialMarch() {
-    // get the current time
-    systemEventCurrentTime = millis();
-
-    // if time has expired, turn off and exit
-    if (systemEventCurrentTime > systemEventEndTime) {
-        currentSystemEvent = I2C_SystemEvent::Off;
-        return;
-    }
-
-    int beatInMilliseconds = 577;
-
-    // if delay time has expired, change the color randomly
-    if (systemEventPhaseEndTime < systemEventCurrentTime) {
-        switch (systemEventPhase) {
-        case 0:
-            setLed(I2C_HP_Color::Red);
-            systemEventPhaseEndTime = systemEventCurrentTime + beatInMilliseconds;
-            systemEventPhase = 1;
-            break;
-
-        case 1:
-            setLed(I2C_HP_Color::Off);
-            systemEventPhaseEndTime = systemEventCurrentTime + beatInMilliseconds;
-            systemEventPhase = 0;
-            break;
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-// TWITCH COLOR
-//------------------------------------------------------------------------------
-void setupTwitchHPColor() {
-    systemEventEndTime = systemEventStartTime + 3600000;
-    systemEventPhase = 0;
-    systemEventPhaseEndTime = 0;
-}
-
-void updateTwitchHPColor() {
+void processTwitch() {
+    if (isTwitchOn) {
         // get the current time
-    systemEventCurrentTime = millis();
+        currentTime = millis();
 
-    // if time has expired, turn off and exit
-    if (systemEventCurrentTime > systemEventEndTime) {
-        currentSystemEvent = I2C_SystemEvent::Off;
-        return;
-    }
-    
-    // if delay time has expired, change the color randomly
-    if (systemEventPhaseEndTime < systemEventCurrentTime) {
-        int colorNumber = random((int)I2C_HP_Color::Off,((int)I2C_HP_Color::White)+1);
-        setLed((I2C_HP_Color::Value)colorNumber);
-        systemEventPhaseEndTime = systemEventCurrentTime + random(4, 9) * 1000;
+        if (endTime < currentTime) {  
+            // twitch here 
+            setServo1(random(180));
+            setServo2(random(180));
+
+            // set new end time
+            endTime = currentTime + (random(5000)) + 3000;
+        }
     }
 }
-
 
 //------------------------------------------------------------------------------
 // I2C
 //------------------------------------------------------------------------------
 // Adding braces after case statements to fix 'jumping the case label'error - ugh
 void receiveEvent(int eventCode) {
-    currentMode = (I2C_HP_Mode::Value)Wire.read();
+    I2C_HP_Mode::Value currentMode = (I2C_HP_Mode::Value)Wire.read();
 
     switch (currentMode) {
         case I2C_HP_Mode::Color:
@@ -195,53 +111,48 @@ void receiveEvent(int eventCode) {
             setLed(color);
         }
         break;
-        
-        case I2C_HP_Mode::SystemEvent:
+
+        case I2C_HP_Mode::Servo:
         {
-            currentSystemEvent = (I2C_SystemEvent::Value)Wire.read();
-            systemEventStartTime = millis();
-    
-            switch (currentSystemEvent) {
-                case I2C_SystemEvent::Off:
-                    break;
-    
-                case I2C_SystemEvent::LeiaMessage:
-                    setupLeiaMessage();
-                    break;
-    
-                case I2C_SystemEvent::ImperialMarch:
-                    setupImperialMarch();
-                    break;
-                    
-                case I2C_SystemEvent::TwitchHPColor:
-                    setupTwitchHPColor();
-                    break;
+            I2C_HP_Servo::Value servo = (I2C_HP_Servo::Value)Wire.read();
+
+            int hp1Value = 90;
+            int hp2Value = 90;
+
+            // set position values based on the enum
+            switch (servo) {
+                case I2C_HP_Servo::TopLeft: { hp1Value = 0; hp2Value = 0; } break;
+                case I2C_HP_Servo::Top: { hp1Value = 90; hp2Value = 0; } break;
+                case I2C_HP_Servo::TopRight: { hp1Value = 180; hp2Value = 0; } break;
+                case I2C_HP_Servo::Left: { hp1Value = 0; hp2Value = 90; } break;
+                case I2C_HP_Servo::Center: { hp1Value = 90; hp2Value = 90; } break;
+                case I2C_HP_Servo::Right: { hp1Value = 180; hp2Value = 90; } break;
+                case I2C_HP_Servo::BottomLeft: { hp1Value = 0; hp2Value = 180; } break;
+                case I2C_HP_Servo::Bottom: { hp1Value = 90; hp2Value = 180; } break;
+                case I2C_HP_Servo::BottomRight: { hp1Value = 180; hp2Value = 180; } break;
+                case I2C_HP_Servo::MoveTo: { hp1Value = Wire.read(); hp2Value = Wire.read(); } break;
+                case I2C_HP_Servo::TwitchOn: { isTwitchOn = true; } break;
+                case I2C_HP_Servo::TwitchOff: { isTwitchOn = false; } break;
             }
-        }
-        break;
-    }
-}
 
-void processSystemEvent() {
-    if (currentMode == I2C_HP_Mode::SystemEvent) {
-        switch (currentSystemEvent) {
-            case I2C_SystemEvent::Off:
-                setLed(I2C_HP_Color::Off);
-                break;
-
-            case I2C_SystemEvent::LeiaMessage:
-                updateLeiaMessage();
-                break;
-
-            case I2C_SystemEvent::ImperialMarch:
-                updateImperialMarch();
-                break;
-                
-            case I2C_SystemEvent::TwitchHPColor:
-                updateTwitchHPColor();
-                break;
+            // move servo
+            setServo1(clamp(hp1Value, SERVOMIN, SERVOMAX));
+            setServo2(clamp(hp2Value, SERVOMIN, SERVOMAX));
         }
     }
 }
+
+//------------------------------------------------------------------------------
+// HELPER FUNCTIONS
+//------------------------------------------------------------------------------
+int clamp(int value, int min, int max) {
+    if (value < min) 
+        return min;
+    else if (value > max)
+        return max;
+
+    return value;
+}
+
 
 
